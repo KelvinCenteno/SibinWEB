@@ -104,7 +104,7 @@
             box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
         }
         /* Estilo del formulario */
-        #formulario {
+        .formulario {
             display: none; /* Ocultar el formulario inicialmente */
             background: rgba(255, 255, 255, 0.8);
             border-radius: 10px;
@@ -117,15 +117,14 @@
             transform: translate(-50%, -50%);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        #formulario input {
-            width: 40%;
+        .formulario input {
+            width: 15%;
             padding: 10px;
-            margin: 10px 0;
-            display: flex;
+            margin: 20px 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        #formulario button {
+        .formulario button {
             padding: 10px 20px;
             background: firebrick;
             color: white;
@@ -134,14 +133,14 @@
             cursor: pointer;
             border-radius: 5px;
         }
-        #formulario button:hover {
+        .formulario button:hover {
             background: darkred;
         }
-        #formulario .cerrar {
+        .formulario .cerrar {
             background: gray;
             margin-top: 10px;
         }
-        #formulario .cerrar:hover {
+        .formulario .cerrar:hover {
             background: darkgray;
         }
     </style>
@@ -156,9 +155,9 @@
                 <span>INVENTARIO PARA </span>
                 <span>BIENES NACIONALES </span>
                 <span>(SIBIN)</span></div>
-            <button class="button" onclick="mostrarFormulario()">REGISTRO</button>
-            <button class="button" onclick="highlight(this)">ASIGNACIÓN</button>
-            <button class="button" onclick="highlight(this)">CONSULTA</button>
+            <button class="button" onclick="mostrarFormulario('formulario1')">REGISTRO</button>
+            <button class="button" onclick="mostrarFormulario('formulario2')">ASIGNACIÓN</button>
+            <button class="button" onclick="mostrarFormulario('formulario3')">CONSULTA</button>
             <button class="button" onclick="highlight(this)">DESINCORPORACIÓN</button>
             <button class="button" onclick="highlight(this)">REPORTE</button>
         </div>
@@ -171,31 +170,77 @@
             </video> 
         </div>
         <!-- Formulario -->
-        <div id="formulario">
-            <h2>Registro de Bienes Nacionales</h2>
-            <input type="text" placeholder="Nombre">
-            <input type="text" placeholder="Apellido">
-            <input type="email" placeholder="Correo Electrónico">
-            <button>Enviar</button>
-            <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
-        </div>
-    </div>
-    <script>
-        function mostrarFormulario() {
-            document.getElementById('formulario').style.display = 'block';
-        }
-
-        function cerrarFormulario() {
-            document.getElementById('formulario').style.display = 'none';
-        }
-
-        function highlight(element) {
-            element.classList.add('highlight');
-            setTimeout(() => {
-                element.classList.remove('highlight');
-            }, 500);
-        }
-    </script>
-</body>
-</html>
-
+        <div id="formularios">
+            <div id="formulario1" class="formulario"> 
+                <h2>Registro de Bienes Nacionales</h2> 
+                <label for="codigo">Código</label> 
+                <input type="text" id="codigo" placeholder="Codigo">
+                <label for="categoria">Categoría</label> 
+                <input type="text" id="categoria" placeholder="Categoria">
+                <label for="marca">Marca</label> 
+                <input type="text" id="marca" placeholder="Marca">
+                <br><label for="producto">Producto</label>
+                <input type="text" id="producto" placeholder="Producto">
+                <label for="color">Color</label> 
+                <input type="text" id="color" placeholder="Color"> 
+                <label for="serial">Serial</label> 
+                <input type="text" id="serial" placeholder="Serial">
+                <br><label for="fecha_registro">Fecha de Registro</label> 
+                <input type="text" id="fecha_registro" placeholder="Fecha de Registro">
+                <label for="cant">Cantidad</label>
+                <input type="text" id="cantidad" placeholder="Cantidad">
+                <label for="imagen">Imagen</label> 
+                <input type="text" id="imagen" placeholder="Imagen"> 
+                <br><button>Enviar</button> 
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+            </div>
+            <div id="formulario2" class="formulario">
+                <h2>Asignación</h2>
+                <!-- Aquí puedes agregar los campos necesarios para este formulario -->
+                <label for="asignacion-codigo">Código de Asignación</label>
+                <input type="text" id="asignacion-codigo" placeholder="Código de Asignación">
+                <label for="asignacion-fecha">Fecha de Asignación</label>
+                <input type="text" id="asignacion-fecha" placeholder="Fecha de Asignación">
+                <br><button>Enviar</button> 
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+            </div>
+            <div id="formulario3" class="formulario"> 
+                <h2>Consulta</h2>
+                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
+                 <label for="consulta-fecha">Fecha de Consulta</label>
+                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
+                 <br><button>Enviar</button>
+                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+             </div>
+         </div>
+     </div>
+     <script>
+         function mostrarFormulario(formularioId) {
+             // Ocultar todos los formularios
+             const formularios = document.getElementsByClassName('formulario');
+             for (let formulario of formularios) {
+                 formulario.style.display = 'none';
+             }
+ 
+             // Mostrar el formulario seleccionado
+             const formularioSeleccionado = document.getElementById(formularioId);
+             formularioSeleccionado.style.display = 'block';
+         }
+ 
+         function cerrarFormulario() {
+             const formularios = document.getElementsByClassName('formulario');
+             for (let formulario of formularios) {
+                 formulario.style.display = 'none';
+             }
+         }
+ 
+         function highlight(element) {
+             element.classList.add('highlight');
+             setTimeout(() => {
+                 element.classList.remove('highlight');
+             }, 500);
+         }
+     </script>
+ </body>
+ </html>
+               
