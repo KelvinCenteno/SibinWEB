@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pagina_principal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 98vw;
+            height: 98vh;
+            background-image: url('/static/Imagen2.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+        }
+        .sidebar {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .header {
+            padding: 20px;
+            font-size: 20px;
+            color: firebrick;
+            align-items: center;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        .welcome {
+            font-size: 12px;
+            color: firebrick;
+            margin-bottom: 20px;
+            position: absolute; 
+            top: 20px; 
+            right: 20px;
+        }
+        .titulo {
+            font-size: 18px;
+            font-family: 'Franklin Gothic Medium';
+            color: firebrick;
+            margin-bottom: 20px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: absolute; 
+            top: 4%; 
+            left: 9.2%; 
+        }
+        .button {
+            padding: 20px 20px;
+            margin: 10px 0;
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 15px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            width: 100%;
+        }
+        .button:hover {
+            background: darkred;
+        }
+        .highlight {
+            color: rgb(110, 107, 107);
+        }
+        .video-container { 
+            width: 78%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-top: 0px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+        }
+        video { 
+            width: 70%; 
+            height: auto; 
+            border: none; 
+            border-radius: 5px; 
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+        }
+        /* Estilo del formulario */
+        #formulario {
+            display: none; /* Ocultar el formulario inicialmente */
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 50%;
+            left: 60%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #formulario input {
+            width: 40%;
+            padding: 10px;
+            margin: 10px 0;
+            display: flex;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #formulario button {
+            padding: 10px 20px;
+            background: firebrick;
+            color: white;
+            align-items: end;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #formulario button:hover {
+            background: darkred;
+        }
+        #formulario .cerrar {
+            background: gray;
+            margin-top: 10px;
+        }
+        #formulario .cerrar:hover {
+            background: darkgray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="/static/logo2.jpg" alt="Logo" class="logo">
+            <div class="welcome">¡Bienvenido Usuario {{ usuario }}!</div>
+            <div class="titulo">
+                <span>SISTEMA DE </span>
+                <span>INVENTARIO PARA </span>
+                <span>BIENES NACIONALES </span>
+                <span>(SIBIN)</span></div>
+            <button class="button" onclick="mostrarFormulario()">REGISTRO</button>
+            <button class="button" onclick="highlight(this)">ASIGNACIÓN</button>
+            <button class="button" onclick="highlight(this)">CONSULTA</button>
+            <button class="button" onclick="highlight(this)">DESINCORPORACIÓN</button>
+            <button class="button" onclick="highlight(this)">REPORTE</button>
+        </div>
+        <div class="video-container"> 
+            <video autoplay muted loop>
+                <source src="/static/VideoLogo.mp4" type="video/mp4">
+                <source src="/static/VideoLogo.webm" type="video/webm">
+                <source src="/static/VideoLogo.ogv" type="video/ogg">
+                Tu navegador no soporta la etiqueta de video. 
+            </video> 
+        </div>
+        <!-- Formulario -->
+        <div id="formulario">
+            <h2>Registro de Bienes Nacionales</h2>
+            <input type="text" placeholder="Nombre">
+            <input type="text" placeholder="Apellido">
+            <input type="email" placeholder="Correo Electrónico">
+            <button>Enviar</button>
+            <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+        </div>
+    </div>
+    <script>
+        function mostrarFormulario() {
+            document.getElementById('formulario').style.display = 'block';
+        }
+
+        function cerrarFormulario() {
+            document.getElementById('formulario').style.display = 'none';
+        }
+
+        function highlight(element) {
+            element.classList.add('highlight');
+            setTimeout(() => {
+                element.classList.remove('highlight');
+            }, 500);
+        }
+    </script>
+</body>
+</html>
+
