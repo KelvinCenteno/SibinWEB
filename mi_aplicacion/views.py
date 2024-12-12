@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .db import validar_usuario  # Importar la función de validación
 
+
 def index(request):
     return render(request, 'login.html')
 

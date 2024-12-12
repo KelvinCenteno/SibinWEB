@@ -71,19 +71,21 @@
         }
         .button {
             padding: 20px 20px;
-            margin: 10px 0;
+            margin: 5px 0;
             background: transparent;
             color: white;
             border: 2px solid white;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 19px;
+            text-align: center;
             border-radius: 15px;
             box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             width: 100%;
+        
         }
         .button:hover {
-            background: darkred;
+            background:  rgba(151, 8, 8, 0.8);
         }
         .highlight {
             color: rgb(110, 107, 107);
@@ -143,6 +145,27 @@
         .formulario .cerrar:hover {
             background: darkgray;
         }
+        .dropdown-menu {
+            display: none;
+            flex-direction: column;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .dropdown-menu button {
+            margin: 5px 0;
+            padding: 10px 20px;
+            background: lightgray;
+            color: black;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .dropdown-menu button:hover {
+            background: gray;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -155,13 +178,17 @@
                 <span>INVENTARIO PARA </span>
                 <span>BIENES NACIONALES </span>
                 <span>(SIBIN)</span></div>
-            <button class="button" onclick="mostrarFormulario('formulario1')">REGISTRO</button>
-            <button class="button" onclick="mostrarFormulario('formulario2')">ASIGNACIÓN</button>
-            <button class="button" onclick="mostrarFormulario('formulario3')">CONSULTA</button>
-            <button class="button" onclick="highlight(this)">DESINCORPORACIÓN</button>
-            <button class="button" onclick="highlight(this)">REPORTE</button>
+            <button class="button" onclick="mostrarFormulario('formulario1')" onmouseover="hideDropdown('dropdown1')">REGISTRO</button>
+            <button class="button" onclick="mostrarFormulario('formulario2')" onmouseover="hideDropdown('dropdown1')">ASIGNACIÓN</button>
+            <button class="button" onmouseover="showDropdown('dropdown1')">CONSULTA</button>
+            <div id="dropdown1" class="dropdown-menu">
+                <button onclick="mostrarFormulario('formulario4')">Bienes Asignados</button>
+                <button onclick="mostrarFormulario('formulario3')">Bienes Disponibles</button>
+            </div>    
+            <button class="button" onclick="highlight(this)" onmouseover="hideDropdown('dropdown1')">DESINCORPORACIÓN</button>
+            <button class="button" onclick="highlight(this)" onmouseover="hideDropdown('dropdown1')" >REPORTE</button>
         </div>
-        <div class="video-container"> 
+        <div class="video-container" onmouseover="hideDropdown('dropdown1')"> 
             <video autoplay muted loop>
                 <source src="/static/VideoLogo.mp4" type="video/mp4">
                 <source src="/static/VideoLogo.webm" type="video/webm">
@@ -207,7 +234,23 @@
             <div id="formulario3" class="formulario"> 
                 <h2>Consulta</h2>
                  <!-- Aquí puedes agregar los campos necesarios para este formulario -->
-                 <label for="consulta-fecha">Fecha de Consulta</label>
+                 <label for="consulta-fecha">Bienes Disponibles</label>
+                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
+                 <br><button>Enviar</button>
+                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+             </div>
+             <div id="formulario4" class="formulario"> 
+                <h2>Consulta</h2>
+                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
+                 <label for="consulta-fecha">Bienes Asignados</label>
+                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
+                 <br><button>Enviar</button>
+                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+             </div>
+             <div id="formulario5" class="formulario"> 
+                <h2>Consulta</h2>
+                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
+                 <label for="consulta-fecha">Bienes Asignados</label>
                  <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
                  <br><button>Enviar</button>
                  <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
@@ -240,6 +283,15 @@
                  element.classList.remove('highlight');
              }, 500);
          }
+         function showDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = 'flex';
+        }
+
+        function hideDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = 'none';
+        }
      </script>
  </body>
  </html>
