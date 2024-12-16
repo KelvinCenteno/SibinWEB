@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Desplegable</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .button {
+            width: 100%;
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: transparent;
+            color: firebrick;
+            border: 2px solid firebrick;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: firebrick;
+            color: white;
+        }
+        .dropdown-menu {
+            display: none;
+            flex-direction: column;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .dropdown-menu button {
+            margin: 5px 0;
+            padding: 10px 20px;
+            background: lightgray;
+            color: black;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .dropdown-menu button:hover {
+            background: gray;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <button class="button" onmouseover="toggleDropdown('dropdown1')">REGISTRO</button>
+        <div id="dropdown1" class="dropdown-menu">
+            <button onclick="mostrarFormulario('formulario1')">Submenú 1</button>
+            <button onclick="mostrarFormulario('formulario2')">Submenú 2</button>
+        </div>
+        <button class="button" onmouseover="toggleDropdown('dropdown2')">ASIGNACIÓN</button>
+        <div id="dropdown2" class="dropdown-menu">
+            <button onclick="mostrarFormulario('formulario3')">Submenú A</button>
+            <button onclick="mostrarFormulario('formulario4')">Submenú B</button>
+        </div>
+        <button class="button">CONSULTA</button>
+        <button class="button">DESINCORPORACIÓN</button>
+        <button class="button">REPORTE</button>
+    </div>
+
+    <script>
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const dropdowns = document.querySelectorAll('.dropdown-menu');
+            dropdowns.forEach(dd => {
+                if (dd.id !== dropdownId) dd.style.display = 'none';
+            });
+            dropdown.style.display = (dropdown.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function mostrarFormulario(formularioId) {
+            // Función para mostrar el formulario correspondiente
+            console.log(`Mostrar formulario: ${formularioId}`);
+        }
+    </script>
+
+<body>
+    <div class="sidebar">
+        <div class="dropdown" onmouseover="showDropdown('dropdown1')" onmouseout="hideDropdown('dropdown1')">
+            <button class="button">REGISTRO</button>
+            <div id="dropdown1" class="dropdown-menu">
+                <button onclick="mostrarFormulario('formulario1')">Submenú 1</button>
+                <button onclick="mostrarFormulario('formulario2')">Submenú 2</button>
+            </div>
+        </div>
+        <div class="dropdown" onmouseover="showDropdown('dropdown2')" onmouseout="hideDropdown('dropdown2')">
+            <button class="button">ASIGNACIÓN</button>
+            <div id="dropdown2" class="dropdown-menu">
+                <button onclick="mostrarFormulario('formulario3')">Submenú A</button>
+                <button onclick="mostrarFormulario('formulario4')">Submenú B</button>
+            </div>
+        </div>
+        <button class="button">CONSULTA</button>
+        <button class="button">DESINCORPORACIÓN</button>
+        <button class="button">REPORTE</button>
+    </div>
+
+    <script>
+        function showDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = 'flex';
+        }
+
+        function hideDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = 'none';
+        }
+
+        function mostrarFormulario(formularioId) {
+            // Función para mostrar el formulario correspondiente
+            console.log(`Mostrar formulario: ${formularioId}`);
+        }
+    </script>
+</body>
+</html>

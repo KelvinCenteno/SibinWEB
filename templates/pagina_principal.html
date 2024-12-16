@@ -126,6 +126,13 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        .formulario image {
+            width: 15%;
+            padding: 10px;
+            margin: 20px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
         .formulario button {
             padding: 10px 20px;
             background: firebrick;
@@ -185,8 +192,8 @@
                 <button onclick="mostrarFormulario('formulario4')">Bienes Asignados</button>
                 <button onclick="mostrarFormulario('formulario3')">Bienes Disponibles</button>
             </div>    
-            <button class="button" onclick="highlight(this)" onmouseover="hideDropdown('dropdown1')">DESINCORPORACIÓN</button>
-            <button class="button" onclick="highlight(this)" onmouseover="hideDropdown('dropdown1')" >REPORTE</button>
+            <button class="button" onclick="mostrarFormulario('formulario5')" onmouseover="hideDropdown('dropdown1')">DESINCORPORACIÓN</button>
+            <button class="button" onclick="mostrarFormulario('formulario6')" onmouseover="hideDropdown('dropdown1')" >REPORTE</button>
         </div>
         <div class="video-container" onmouseover="hideDropdown('dropdown1')"> 
             <video autoplay muted loop>
@@ -213,11 +220,11 @@
                 <label for="serial">Serial</label> 
                 <input type="text" id="serial" placeholder="Serial">
                 <br><label for="fecha_registro">Fecha de Registro</label> 
-                <input type="text" id="fecha_registro" placeholder="Fecha de Registro">
+                <input type="date" id="fecha_registro" placeholder="Fecha de Registro">
                 <label for="cant">Cantidad</label>
                 <input type="text" id="cantidad" placeholder="Cantidad">
                 <label for="imagen">Imagen</label> 
-                <input type="text" id="imagen" placeholder="Imagen"> 
+                <input type="file" id="imagen"> 
                 <br><button>Enviar</button> 
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
@@ -248,14 +255,17 @@
                  <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
              </div>
              <div id="formulario5" class="formulario"> 
-                <h2>Consulta</h2>
+                <h2>Desincorporación</h2>
                  <!-- Aquí puedes agregar los campos necesarios para este formulario -->
                  <label for="consulta-fecha">Bienes Asignados</label>
                  <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
                  <br><button>Enviar</button>
                  <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
              </div>
-         </div>
+             <div id="formulario6" class="formulario">
+                <h2>Reporte</h2>   
+
+            </div>
      </div>
      <script>
          function mostrarFormulario(formularioId) {
