@@ -33,3 +33,20 @@ def validar_usuario(usuario, contrasena):
     except Exception as e:
         print(f"Error al validar usuario: {e}")
         return False
+
+def obtener_gerencias():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = "SELECT id, nombre FROM Gerencia"  # Ajusta los nombres de columna según tu tabla
+        cursor.execute(query)
+        gerencias = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return gerencias
+    except Exception as e:
+        print(f"Error al obtener gerencias: {e}")
+        return []

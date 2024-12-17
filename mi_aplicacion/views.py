@@ -2,8 +2,8 @@ import json
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .db import validar_usuario  # Importar la función de validación
-
+from .db import validar_usuario, obtener_gerencias
+from .models import Option
 
 def index(request):
     return render(request, 'login.html')
@@ -24,3 +24,7 @@ def login_view(request):
 def pagina_principal(request):
     usuario = request.session.get('usuario', 'Invitado')  # Obtener el usuario de la sesión
     return render(request, 'pagina_principal.html', {'usuario': usuario})
+
+def get_gerencias(request):
+    gerencias = obtener_gerencias()
+    return JsonResponse(gerencias, safe=False)
