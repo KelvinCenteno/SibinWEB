@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pagina_principal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 98vw;
+            height: 98vh;
+            background-image: url('/static/Imagen2.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+        }
+        .sidebar {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .header {
+            padding: 20px;
+            font-size: 20px;
+            color: firebrick;
+            align-items: center;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        .welcome {
+            font-size: 12px;
+            color: firebrick;
+            margin-bottom: 20px;
+            position: absolute; 
+            top: 20px; 
+            right: 20px;
+        }
+        .titulo {
+            font-size: 18px;
+            font-family: 'Franklin Gothic Medium';
+            color: firebrick;
+            margin-bottom: 20px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: absolute; 
+            top: 4%; 
+            left: 9.2%; 
+        }
+        .button {
+            padding: 20px 20px;
+            margin: 5px 0;
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            font-size: 19px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            width: 100%;
+        
+        }
+        .button:hover {
+            background:  rgba(151, 8, 8, 0.8);
+        }
+        .highlight {
+            color: rgb(110, 107, 107);
+        }
+        .video-container { 
+            width: 78%; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-top: 0px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+        }
+        video { 
+            width: 70%; 
+            height: auto; 
+            border: none; 
+            border-radius: 5px; 
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+        }
+        /* Estilo del formulario */
+        .formulario {
+            display: none; /* Ocultar el formulario inicialmente */
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 50%;
+            left: 60%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .formulario input {
+            width: 15%;
+            padding: 10px;
+            margin: 20px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .formulario button {
+            padding: 10px 20px;
+            background: firebrick;
+            color: white;
+            align-items: end;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .formulario button:hover {
+            background: darkred;
+        }
+        .formulario .cerrar {
+            background: gray;
+            margin-top: 10px;
+        }
+        .formulario .cerrar:hover {
+            background: darkgray;
+        }
+        .dropdown-menu {
+            display: none;
+            flex-direction: column;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .dropdown-menu button {
+            margin: 5px 0;
+            padding: 10px 20px;
+            background: lightgray;
+            color: black;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .dropdown-menu button:hover {
+            background: gray;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="/static/logo2.jpg" alt="Logo" class="logo">
+            <div class="welcome">¡Bienvenido Usuario {{ usuario }}!</div>
+            <div class="titulo">
+                <span>SISTEMA DE </span>
+                <span>INVENTARIO PARA </span>
+                <span>BIENES NACIONALES </span>
+                <span>(SIBIN)</span></div>
+            <button class="button" onclick="mostrarFormulario('formulario1')" onmouseover="hideDropdown('dropdown1')">REGISTRO</button>
+            <button class="button" onclick="mostrarFormulario('formulario2')" onmouseover="hideDropdown('dropdown1')">ASIGNACIÓN</button>
+            <button class="button" onmouseover="showDropdown('dropdown1')">CONSULTA</button>
+            <div id="dropdown1" class="dropdown-menu">
+                <button onclick="mostrarFormulario('formulario4')">Bienes Asignados</button>
+                <button onclick="mostrarFormulario('formulario3')">Bienes Disponibles</button>
+            </div>    
+            <button class="button" onclick="mostrarFormulario('formulario5')" onmouseover="hideDropdown('dropdown1')">DESINCORPORACIÓN</button>
+            <button class="button" onclick="mostrarFormulario('formulario6')" onmouseover="hideDropdown('dropdown1')" >REPORTE</button>
+        </div>
+        <div class="video-container" onmouseover="hideDropdown('dropdown1')"> 
+            <video autoplay muted loop>
+                <source src="/static/VideoLogo.mp4" type="video/mp4">
+                <source src="/static/VideoLogo.webm" type="video/webm">
+                <source src="/static/VideoLogo.ogv" type="video/ogg">
+                Tu navegador no soporta la etiqueta de video. 
+            </video> 
+        </div>
+        <!-- Formulario -->
+        <div id="formularios">
+            <div id="formulario1" class="formulario"> 
+                <h2>Registro de Bienes Nacionales</h2> 
+                <label for="codigo">Código</label> 
+                <input type="text" id="codigo" placeholder="Codigo">
+                <label for="categoria">Categoría</label> 
+                <input type="text" id="categoria" placeholder="Categoria">
+                <label for="marca">Marca</label> 
+                <input type="text" id="marca" placeholder="Marca">
+                <br><label for="producto">Producto</label>
+                <input type="text" id="producto" placeholder="Producto">
+                <label for="color">Color</label> 
+                <input type="text" id="color" placeholder="Color"> 
+                <label for="serial">Serial</label> 
+                <input type="text" id="serial" placeholder="Serial">
+                <br><label for="fecha_registro">Fecha de Registro</label> 
+                <input type="text" id="fecha_registro" placeholder="Fecha de Registro">
+                <label for="cant">Cantidad</label>
+                <input type="text" id="cantidad" placeholder="Cantidad">
+                <label for="imagen">Imagen</label> 
+                <input type="text" id="imagen" placeholder="Imagen"> 
+                <br><button>Enviar</button> 
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+            </div>
+            <div id="formulario2" class="formulario">
+                <h2>Asignación</h2>
+                <!-- Aquí puedes agregar los campos necesarios para este formulario -->
+                <label for="asignacion-codigo">Código de Asignación</label>
+                <input type="text" id="asignacion-codigo" placeholder="Código de Asignación">
+                <label for="asignacion-fecha">Fecha de Asignación</label>
+                <input type="text" id="asignacion-fecha" placeholder="Fecha de Asignación">
+                <br><button>Enviar</button> 
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+            </div>
+            <div id="formulario3" class="formulario"> 
+                <h2>Consulta</h2>
+                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
+                 <label for="consulta-fecha">Bienes Disponibles</label>
+                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
+                 <br><button>Enviar</button>
+                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+             </div>
+             <div id="formulario4" class="formulario"> 
+                <h2>Consulta</h2>
+                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
+                 <label for="consulta-fecha">Bienes Asignados</label>
+                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
+                 <br><button>Enviar</button>
+                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+             </div>
+
+             <div id="formulario5" class="formulario"> 
+                <h2>Desincorporación de Bienes Nacionales Asignados</h2>
+                <div>
+                    <button onclick="filtrarTabla('')">Todos</button>
+                    <button onclick="filtrarTabla('Marca X')">Marca X</button>
+                    <button onclick="filtrarTabla('Marca Y')">Marca Y</button>
+                    <button onclick="filtrarTabla('Rojo')">Rojo</button>
+                    <button onclick="filtrarTabla('Azul')">Azul</button>
+                    <!-- Agrega más botones según sea necesario -->
+                </div>
+                <h2>Lista de Productos</h2>
+                <table id="productosTable">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Marca</th>
+                            <th>Descripción</th>
+                            <th>Color</th>
+                            <th>Gerencia</th>
+                            <th>Fecha de Ingreso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se llenará la tabla con datos de la base de datos -->
+                        <tr>
+                            <td>001</td>
+                            <td>Producto A</td>
+                            <td>Marca X</td>
+                            <td>Descripción del Producto A</td>
+                            <td>Rojo</td>
+                            <td>Gerencia 1</td>
+                            <td>2023-01-01</td>
+                        </tr>
+                        <tr>
+                            <td>002</td>
+                            <td>Producto B</td>
+                            <td>Marca Y</td>
+                            <td>Descripción del Producto B</td>
+                            <td>Azul</td>
+                            <td>Gerencia 2</td>
+                            <td>2023-02-01</td>
+                        </tr>
+                        <tr>
+                            <td>003</td>
+                            <td>Producto C</td>
+                            <td>Marca X</td>
+                            <td>Descripción del Producto C</td>
+                            <td>Rojo</td>
+                            <td>Gerencia 1</td>
+                            <td>2023-03-01</td>
+                        </tr>
+                        <tr>
+                            <td>004</td>
+                            <td>Producto D</td>
+                            <td>Marca Y</td>
+                            <td>Descripción del Producto D</td>
+                            <td>Verde</td>
+                            <td>Gerencia 2</td>
+                            <td>2023-04-01</td>
+                        </tr>
+                        <!-- Agrega más filas según sea necesario -->
+                    </tbody>
+                </table>
+            </div>
+            <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse; /* Para que las líneas se vean bien */
+                    margin-top: 20px; /* Espacio entre el título y la tabla */
+                }
+                th, td {
+                    border: 1px solid #ddd; /* Línea de borde */
+                    padding: 10px; /* Espaciado interno */
+                    text-align: left; /* Alineación del texto */
+                }
+                th {
+                    background-color: #f2f2f2; /* Color de fondo de las cabeceras */
+                }
+            </style>
+            <script>
+                function filtrarTabla(valor) {
+                    const table = document.getElementById('productosTable');
+                    const rows = table.getElementsByTagName('tr');
+
+                    for (let i = 1; i < rows.length; i++) { // Comenzar desde 1 para omitir la cabecera
+                        const cells = rows[i].getElementsByTagName('td');
+                        let mostrarFila = false;
+
+                        // Verificar si el valor de filtrado está en alguna de las celdas
+                        for (let j = 0; j < cells.length; j++) {
+                            if (cells[j].innerText.includes(valor) || valor === '') {
+                                mostrarFila = true;
+                                break;
+                            }
+                        }
+
+                        // Mostrar u ocultar la fila según el resultado del filtrado
+                        rows[i].style.display = mostrarFila ? '' : 'none';
+                    }
+                }
+            </script>
+
+             <div id="formulario6" class="formulario"> 
+                <h2>Reporte</h2>
+         </div>
+     </div>
+     <script>
+         function mostrarFormulario(formularioId) {
+             // Ocultar todos los formularios
+             const formularios = document.getElementsByClassName('formulario');
+             for (let formulario of formularios) {
+                 formulario.style.display = 'none';
+             }
+ 
+             // Mostrar el formulario seleccionado
+             const formularioSeleccionado = document.getElementById(formularioId);
+             formularioSeleccionado.style.display = 'block';
+         }
+ 
+         function cerrarFormulario() {
+             const formularios = document.getElementsByClassName('formulario');
+             for (let formulario of formularios) {
+                 formulario.style.display = 'none';
+             }
+         }
+ 
+         function highlight(element) {
+             element.classList.add('highlight');
+             setTimeout(() => {
+                 element.classList.remove('highlight');
+             }, 500);
+         }
+         function showDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = 'flex';
+        }
+
+        function hideDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = 'none';
+        }
+     </script>
+ </body>
+ </html>
+               

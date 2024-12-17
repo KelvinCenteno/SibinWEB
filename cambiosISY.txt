@@ -1,0 +1,22 @@
+<script>
+    function filtrarTabla(valor) {
+        const table = document.getElementById('productosTable');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) { // Comenzar desde 1 para omitir la cabecera
+            const cells = rows[i].getElementsByTagName('td');
+            let mostrarFila = false;
+
+            // Verificar si el valor de filtrado está en alguna de las celdas
+            for (let j = 0; j < cells.length; j++) {
+                if (cells[j].innerText.includes(valor) || valor === '') {
+                    mostrarFila = true;
+                    break;
+                }
+            }
+
+            // Mostrar u ocultar la fila según el resultado del filtrado
+            rows[i].style.display = mostrarFila ? '' : 'none';
+        }
+    }
+</script>
