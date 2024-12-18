@@ -234,11 +234,10 @@
             <div id="formulario3" class="formulario"> 
                 <h2>Consulta</h2>
                  <!-- Aquí puedes agregar los campos necesarios para este formulario -->
-                 <label for="consulta-fecha">Bienes Disponibles</label>
-                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
-                 <br><button>Enviar</button>
-                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
-             </div>
+              
+             
+            </div>
+
              <div id="formulario4" class="formulario"> 
                 <h2>Consulta</h2>
                  <!-- Aquí puedes agregar los campos necesarios para este formulario -->
@@ -249,30 +248,24 @@
              </div>
 
              <div id="formulario5" class="formulario"> 
-                <h2>Desincorporación de Bienes Nacionales Asignados</h2>
-                <div>
-                    <button onclick="filtrarTabla('')">Todos</button>
-                    <button onclick="filtrarTabla('Marca X')">Marca X</button>
-                    <button onclick="filtrarTabla('Marca Y')">Marca Y</button>
-                    <button onclick="filtrarTabla('Rojo')">Rojo</button>
-                    <button onclick="filtrarTabla('Azul')">Azul</button>
-                    <!-- Agrega más botones según sea necesario -->
-                </div>
+                <h2>Desincorporación</h2>
+                <label for="palabra">Palabra de búsqueda</label>
+                <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+            
                 <h2>Lista de Productos</h2>
                 <table id="productosTable">
                     <thead>
                         <tr>
-                            <th>Código</th>
-                            <th>Producto</th>
-                            <th>Marca</th>
-                            <th>Descripción</th>
-                            <th>Color</th>
-                            <th>Gerencia</th>
-                            <th>Fecha de Ingreso</th>
+                            <th onclick="ordenarTabla(0)">Código</th>
+                            <th onclick="ordenarTabla(1)">Producto</th>
+                            <th onclick="ordenarTabla(2)">Marca</th>
+                            <th onclick="ordenarTabla(3)">Descripción</th>
+                            <th onclick="ordenarTabla(4)">Color</th>
+                            <th onclick="ordenarTabla(5)">Gerencia</th>
+                            <th onclick="ordenarTabla(6)">Fecha de Ingreso</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Aquí se llenará la tabla con datos de la base de datos -->
                         <tr>
                             <td>001</td>
                             <td>Producto A</td>
@@ -313,6 +306,23 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Modal -->
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="cerrarModal()">&times;</span>
+                    <h2>Motivo de Desincorporación</h2>
+                    <textarea id="motivoInput" placeholder="Ingrese el motivo de desincorporación..."></textarea>
+                     <h3>Ubicación Final</h3>
+                    <select id="ubicacionSelect">
+                        <option value="almacen">Almacén</option>
+                        <option value="donacion">Donación</option>
+                        <option value="reciclaje">Reciclaje</option>
+                        <option value="venta">Venta</option>
+                        <!-- Agrega más opciones según sea necesario -->
+                    </select>
+                    <button onclick="enviarDesincorporacion()">Enviar</button>
+                </div>
+            </div>
             <style>
                 table {
                     width: 100%;
@@ -323,35 +333,128 @@
                     border: 1px solid #ddd; /* Línea de borde */
                     padding: 10px; /* Espaciado interno */
                     text-align: left; /* Alineación del texto */
+                    cursor: pointer; /* Cambia el cursor al pasar sobre las cabeceras */
                 }
                 th {
                     background-color: #f2f2f2; /* Color de fondo de las cabeceras */
                 }
+                .modal {
+                    display: none; /* Ocultar el modal por defecto */
+                    position: fixed; /* Mantener el modal en la misma posición */
+                    z-index: 1; /* Asegurarse de que el modal esté por encima de otros elementos */
+                    left: 0;
+                    top: 0;
+                    width: 100%; /* Ancho completo */
+                    height: 100%; /* Alto completo */
+                    overflow: auto; /* Habilitar desplazamiento si es necesario */
+                    background-color: rgb(0,0,0); /* Color de fondo negro */
+                    background-color: rgba(0,0,0,0.4); /* Fondo negro con opacidad */
+                }
+                .modal-content {
+                    background-color: #fefefe;
+                    margin: 15% auto; /* 15% desde la parte superior y centrado */
+                    padding: 20px;
+                    border: 1px solid #888;
+                    width: 80%; /* Ancho del modal */
+                }
+                .close {
+                    color: #aaa;
+                    float: right;
+                    font-size: 28px;
+                    font-weight: bold;
+                }
+                .close:hover,
+                .close:focus {
+                    color: black;
+                    text-decoration: none;
+                    cursor: pointer;
+                }
             </style>
+
             <script>
-                function filtrarTabla(valor) {
+                let ordenAscendente = true; // Variable para controlar el orden
+            
+                function filtrarTabla() {
+                    const input = document.getElementById('searchInput');
+                    const filter = input.value.toLowerCase();
                     const table = document.getElementById('productosTable');
                     const rows = table.getElementsByTagName('tr');
-
+            
                     for (let i = 1; i < rows.length; i++) { // Comenzar desde 1 para omitir la cabecera
                         const cells = rows[i].getElementsByTagName('td');
                         let mostrarFila = false;
-
-                        // Verificar si el valor de filtrado está en alguna de las celdas
+            
+                        // Verificar si el valor de búsqueda está en alguna de las celdas
                         for (let j = 0; j < cells.length; j++) {
-                            if (cells[j].innerText.includes(valor) || valor === '') {
+                            if (cells[j].innerText.toLowerCase().includes(filter)) {
                                 mostrarFila = true;
                                 break;
                             }
                         }
-
+            
                         // Mostrar u ocultar la fila según el resultado del filtrado
                         rows[i].style.display = mostrarFila ? '' : 'none';
                     }
                 }
-            </script>
+                function ordenarTabla(columnaIndex) {
+                    const table = document.getElementById('productosTable');
+                    const rows = Array.from(table.rows).slice(1); // Obtener todas las filas excepto la cabecera
+                    const orden = ordenAscendente ? 1 : -1; // Determinar el orden
+            
+                    rows.sort((a, b) => {
+                        const celdaA = a.cells[columnaIndex].innerText.toLowerCase();
+                        const celdaB = b.cells[columnaIndex].innerText.toLowerCase();
+            
+                        if (celdaA < celdaB) return -1 * orden;
+                        if (celdaA > celdaB) return 1 * orden;
+                        return 0;
+                    });
+            
+                    // Reinsertar las filas ordenadas en la tabla
+                    rows.forEach(row => table.appendChild(row));
+            
+                    // Cambiar el estado del orden para la próxima vez
+                    ordenAscendente = !ordenAscendente;
+                }
+                function abrirModal(fila) {
+                    const modal = document.getElementById('modal');
+                    const motivoInput = document.getElementById('motivoInput');
+                    const ubicacionSelect = document.getElementById('ubicacionSelect');
 
-             <div id="formulario6" class="formulario"> 
+                    // Limpiar los campos del modal
+                    motivoInput.value = '';
+                    ubicacionSelect.selectedIndex = 0;
+
+                    // Mostrar el modal
+                    modal.style.display = "block";
+                }
+
+                function cerrarModal() {
+                    const modal = document.getElementById('modal');
+                    modal.style.display = "none";
+                }
+
+                function enviarDesincorporacion() {
+                    const motivo = document.getElementById('motivoInput').value;
+                    const ubicacion = document.getElementById('ubicacionSelect').value;
+
+                    // Aquí puedes agregar la lógica para manejar el motivo y la ubicación
+                    console.log(`Motivo: ${motivo}, Ubicación: ${ubicacion}`);
+
+                    // Cerrar el modal después de enviar
+                    cerrarModal();
+                }
+
+                    // Cerrar el modal si se hace clic fuera de él
+                    window.onclick = function(event) {
+                        const modal = document.getElementById('modal');
+                        if (event.target == modal) {
+                            cerrarModal();
+                        }
+                    }
+            </script> 
+
+<div id="formulario6" class="formulario"> 
                 <h2>Reporte</h2>
          </div>
      </div>
