@@ -1,0 +1,64 @@
+// templates/mi_aplicacion/scripts.js
+
+function mostrarFormulario(formularioId) {
+    const formularios = document.getElementsByClassName('formulario');
+    for (let formulario of formularios) {
+        formulario.style.display = 'none';
+    }
+    const formularioSeleccionado = document.getElementById(formularioId);
+    formularioSeleccionado.style.display = 'block';
+}
+
+function cerrarFormulario() {
+    const formularios = document.getElementsByClassName('formulario');
+    for (let formulario of formularios) {
+        formulario.style.display = 'none';
+    }
+}
+
+function highlight(element) {
+    element.classList.add('highlight');
+    setTimeout(() => {
+        element.classList.remove('highlight');
+    }, 500);
+}
+
+function showDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown.style.display = 'flex';
+}
+
+function hideDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown.style.display = 'none';
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('/mi_aplicacion/get_gerencias/')
+        .then(response => response.json())
+        .then(data => {
+            const comboBox = document.getElementById('gerencias');
+            comboBox.innerHTML = '';  
+            data.forEach(gerencia => {
+                const newOption = document.createElement('option');
+                newOption.value = gerencia[0];  
+                newOption.textContent = gerencia[1];  
+                comboBox.appendChild(newOption);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar las opciones:', error);
+            document.getElementById('gerencias').innerHTML = '<option value="">Error al cargar opciones</option>';
+        });
+
+    // Agregar eventos a los botones
+    document.getElementById('enviarForm1').addEventListener('click', function() {
+        alert('Formulario 1 enviado');
+        // Aquí puedes agregar el código adicional que necesites
+    });
+
+    document.getElementById('enviarForm2').addEventListener('click', function() {
+        alert('Formulario 2 enviado');
+        // Aquí puedes agregar el código adicional que necesites
+    });
+});

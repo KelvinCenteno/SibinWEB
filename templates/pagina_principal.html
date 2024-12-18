@@ -1,3 +1,4 @@
+{% csrf_token %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,7 +83,6 @@
             box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             width: 100%;
-        
         }
         .button:hover {
             background:  rgba(151, 8, 8, 0.8);
@@ -178,19 +178,55 @@
             width: 200px; 
             border: 1px solid #ccc; 
             border-radius: 5px;
-             margin: 10px 0;
+            margin: 10px 10px;
         }
-        .formulario frame { 
-            width: 10px; 
-            height: 10px; 
-            border: 1px solid #ccc; 
-            margin: 10px 0; 
+        .frame { 
+            width: 150px; 
+            height: 150px; 
+            border: 2px solid #ada8a8; 
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            position: absolute; 
+            top: 40%; 
+            left: 70%;  
+        } 
+        .frame img { 
+            max-width: 98%;
+            max-height: 98%px;
         }
-        .formulario .frame img{ 
+        .modal {
             display: none; 
-            width: 100px;  
-            height: 100px;
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+            padding-top: 60px;
         }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 20%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;}
     </style>
 </head>
 <body>
@@ -252,24 +288,22 @@
             </div>
             <div id="formulario2" class="formulario">
                 <h2>Asignación</h2>
-                <!-- Aquí puedes agregar los campos necesarios para este formulario -->
-                <label for="asignacion-codigo">Código de Asignación</label>
-                <input type="text" id="asignacion-codigo" placeholder="Código de Asignación">
                 <label>Selecciona una gerencia:</label>
                 <select id="gerencias" class="combo-box">
                     <option value="" disabled selected>Selecciona una opción...</option>
                 </select>
-                <br><label for="asignacion-fecha">Fecha de Asignación</label>
-                <input type="text" id="asignacion-fecha" placeholder="Fecha de Asignación">
-                <div class="frame" id="frame">
-                    <img src="/static/logo2.jpg" alt="Imagen" id="miImagen">
+                <label for="asignacion-fecha">Fecha de Asignación</label>
+                <input type="date" id="asignacion-fecha" placeholder="Fecha de Asignación">
+                <br><label for="asignacion-codigo">Código de Asignación</label>
+                <input type="text" id="asignacion-codigo" placeholder="Código de Asignación">
+                <div class="frame">
+                    <img src="" id="imagenQR">
                 </div>
-                <br><button>Enviar</button> 
+                <br><button id="enviarAsignacion">Enviar</button> 
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
             <div id="formulario3" class="formulario"> 
                 <h2>Consulta</h2>
-                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
                  <label for="consulta-fecha">Bienes Disponibles</label>
                  <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
                  <br><button>Enviar</button>
@@ -277,7 +311,6 @@
              </div>
              <div id="formulario4" class="formulario"> 
                 <h2>Consulta</h2>
-                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
                  <label for="consulta-fecha">Bienes Asignados</label>
                  <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
                  <br><button>Enviar</button>
@@ -285,7 +318,6 @@
              </div>
              <div id="formulario5" class="formulario"> 
                 <h2>Desincorporación</h2>
-                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
                  <label for="consulta-fecha">Bienes Asignados</label>
                  <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
                  <br><button>Enviar</button>
@@ -296,15 +328,18 @@
 
             </div>
      </div>
+     <div id="qrModal" class="modal"> 
+        <div class="modal-content"> 
+            <span class="close">&times;</span> 
+            <img id="qrModalImg" src="" alt="Código QR" style="width: 100%;"> 
+    </div> 
+</div>
      <script>
          function mostrarFormulario(formularioId) {
-             // Ocultar todos los formularios
              const formularios = document.getElementsByClassName('formulario');
              for (let formulario of formularios) {
                  formulario.style.display = 'none';
              }
- 
-             // Mostrar el formulario seleccionado
              const formularioSeleccionado = document.getElementById(formularioId);
              formularioSeleccionado.style.display = 'block';
          }
@@ -336,11 +371,11 @@
         .then(response => response.json()) 
         .then(data => { 
             const comboBox = document.getElementById('gerencias'); 
-            comboBox.innerHTML = ''; // Limpiar opciones actuales 
+            comboBox.innerHTML = ''; 
             data.forEach(gerencia => { 
                 const newOption = document.createElement('option'); 
-                newOption.value = gerencia[0]; // Asumiendo que el primer valor es el ID 
-                newOption.textContent = gerencia[1]; // Asumiendo que el segundo valor es el nombre 
+                newOption.value = gerencia[0]; 
+                newOption.textContent = gerencia[1];
                 comboBox.appendChild(newOption); 
             }); 
         }) 
@@ -348,7 +383,64 @@
             console.error('Error al cargar las opciones:', error); 
             document.getElementById('gerencias').innerHTML = '<option value="">Error al cargar opciones</option>'; 
         });
-     });     
+     }); 
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('enviarAsignacion').addEventListener('click', function(event) {
+                event.preventDefault();  // Evitar que el formulario se envíe automáticamente
+
+                const codigo = document.getElementById('asignacion-codigo').value;
+                const fechaAsignacion = document.getElementById('asignacion-fecha').value;
+                const gerenciaId = document.getElementById('gerencias').value;
+                
+                const formData = new FormData();
+                formData.append('codigo', codigo);
+                formData.append('fecha_asignacion', fechaAsignacion);
+                formData.append('gerencia_id', gerenciaId);
+                formData.append('csrfmiddlewaretoken', getCookie('csrftoken')); // Añadir token CSRF
+
+                fetch('/mi_aplicacion/generar_qr_y_guardar/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                })
+                .then(response => response.json()) 
+                .then(data => { 
+                    console.log(data.image);
+                    if (data.image) { 
+                        const img = document.getElementById('imagenQR'); 
+                        img.src = `data:image/png;base64,${data.image}`; 
+                        img.style.width = "100%";
+                        img.style.height = "auto";
+                    } else { 
+                        alert('Error al generar el QR.');
+                     } 
+                    }) 
+                    .catch(error => { 
+                        console.error('Error al generar el QR:', error);
+                     }); 
+                    });
+                    // Cerrar el modal
+                    var span = document.getElementsByClassName("close")[0]; 
+                    span.onclick = function() { 
+                        const modal = document.getElementById("qrModal");
+                        modal.style.display = "none";}
+                });
+        function getCookie(name) { 
+            let cookieValue = null; 
+            if (document.cookie && document.cookie !== '') { 
+                const cookies = document.cookie.split(';'); 
+                for (let i = 0; i < cookies.length; i++) { 
+                    const cookie = cookies[i].trim(); 
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) { 
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1)); 
+                        break; 
+                    } 
+                } 
+            } 
+            return cookieValue; }
+    
     </script>
  </body>
  </html>

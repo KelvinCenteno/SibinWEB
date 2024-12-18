@@ -50,3 +50,23 @@ def obtener_gerencias():
     except Exception as e:
         print(f"Error al obtener gerencias: {e}")
         return []
+
+def almacenar_asignacion(codigo, fecha_asignacion, gerencia_id, qr_code):
+    conexion = conectar()
+    if not conexion:
+        return False
+
+    try:
+        cursor = conexion.cursor()
+        query = """
+        INSERT INTO Asignacion (codigo, fecha_asignacion, gerencia_id, qr_code)
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (codigo, fecha_asignacion, gerencia_id, qr_code))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return True
+    except Exception as e:
+        print(f"Error al almacenar la asignación: {e}")
+        return False

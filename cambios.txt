@@ -352,4 +352,167 @@
     </script>
  </body>
  </html>
-               
+     {% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Principal</title>
+    <style>
+        .combo-box {
+            padding: 10px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .frame {
+            width: 220px;
+            height: 220px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="formularios">
+        <div id="formulario2" class="formulario">
+            <h2>Asignación</h2>
+            <label>Selecciona una gerencia:</label>
+            <select id="gerencias" class="combo-box">
+                <option value="" disabled selected>Selecciona una opción...</option>
+            </select>
+            <label for="asignacion-fecha">Fecha de Asignación</label>
+            <input type="date" id="asignacion-fecha" placeholder="Fecha de Asignación">
+            <br><label for="asignacion-codigo">Código de Asignación</label>
+            <input type="text" id="asignacion-codigo" placeholder="Código de Asignación">
+            <div class="frame">
+                <img src="" alt="Imagen QR" id="imagenQR">
+            </div>
+            <br><button id="enviarAsignacion">Enviar</button>
+            <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('enviarAsignacion').addEventListener('click', function(event) {
+                event.preventDefault();  // Evitar que el formulario se envíe automáticamente
+
+                const codigo = document.getElementById('asignacion-codigo').value;
+                const fechaAsignacion = document.getElementById('asignacion-fecha').value;
+                const gerenciaId = document.getElementById('gerencias').value;
+                
+                const formData = new FormData();
+                formData.append('codigo', codigo);
+                formData.append('fecha_asignacion', fechaAsignacion);
+                formData.append('gerencia_id', gerenciaId);
+
+                fetch('/mi_aplicacion/generar_qr_y_guardar/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.image) {
+                        const img = document.getElementById('imagenQR');
+                        img.src = `data:image/png;base64,${data.image}`;
+                    } else {
+                        alert('Error al generar el QR.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al generar el QR:', error);
+                });
+            });
+
+            // Obtener y cargar las opciones de gerencia
+            fetch('/mi_aplicacion/get_gerencias/')
+                .then(response => response.json())
+                .then(data => {
+                    const comboBox = document.getElementById('gerencias');
+                    comboBox.innerHTML = '';  
+                    data.forEach(gerencia => {
+                        const newOption = document.createElement('option');
+                        newOption.value = gerencia[0];  
+                        newOption.textContent = gerencia[1];  
+                        comboBox.appendChild(newOption);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar las opciones:', error);
+                    document.getElementById('gerencias').innerHTML = '<option value="">Error al cargar opciones</option>';
+                });
+        });
+
+        // Función para obtener el token CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function cerrarFormulario() {
+            const formularios = document.getElementsByClassName('formulario');
+            for (let formulario of formularios) {
+                formulario.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+    // Obtener y cargar las opciones de gerencia
+    fetch('/mi_aplicacion/get_gerencias/')
+        .then(response => response.json())
+        .then(data => {
+            const comboBox = document.getElementById('gerencias');
+            comboBox.innerHTML = '';  
+            data.forEach(gerencia => {
+                const newOption = document.createElement('option');
+                newOption.value = gerencia[0];  
+                newOption.textContent = gerencia[1];  
+                comboBox.appendChild(newOption);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar las opciones:', error);
+            document.getElementById('gerencias').innerHTML = '<option value="">Error al cargar opciones</option>';
+        });
+});
+
+// Función para obtener el token CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function cerrarFormulario() {
+    const formularios = document.getElementsByClassName('formulario');
+    for (let formulario of formularios) {
+        formulario.style.display = 'none';
+    }
+}
