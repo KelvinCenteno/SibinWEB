@@ -1,5 +1,6 @@
 import pg8000
 from django.conf import settings
+import base64
 
 db_config = {
     'database': settings.DATABASES['default']['NAME'],
@@ -70,3 +71,50 @@ def almacenar_asignacion(codigo, fecha_asignacion, gerencia_id, qr_code):
     except Exception as e:
         print(f"Error al almacenar la asignación: {e}")
         return False
+
+def obtener_productos():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = """
+        SELECT r.id_registro, r.producto, m.nombre AS marca, r.descripcion, r.color, g.nombre AS gerencia, r.fecha_registro
+        FROM Registro r
+        JOIN Marca m ON r.marca = m.id
+        JOIN Gerencia g ON r.gerencia = g.id
+        """
+        cursor.execute(query)
+        productos = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return productos
+    except Exception as e:
+        print(f"Error al obtener productos: {e}")
+        return []
+    
+def Consulta_Bienes_Asignados():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = """
+        SELECT id, codigo, fecha_asignacion, gerencia_id, qr_code FROM Asignacion
+        """
+        cursor.execute(query)
+        asignaciones = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        asignaciones_convertidas = [] 
+        for asignacion in asignaciones: 
+            asignacion_convertida = list(asignacion) 
+            if asignacion_convertida[4]: # qr_code es el quinto campo 
+                asignacion_convertida[4] = base64.b64encode(asignacion_convertida[4]).decode('utf-8') 
+                asignaciones_convertidas.append(asignacion_convertida) 
+        return asignaciones_convertidas
+    except Exception as e:
+        print(f"Error al obtener asiganciones: {e}")
+        return []

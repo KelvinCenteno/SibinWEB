@@ -77,12 +77,14 @@
             color: white;
             border: 2px solid white;
             cursor: pointer;
-            font-size: 19px;
+            font-size: 120%;
             text-align: center;
             border-radius: 15px;
             box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
             width: 100%;
+            height: 13%;
+        
         }
         .button:hover {
             background:  rgba(151, 8, 8, 0.8);
@@ -105,15 +107,17 @@
             border-radius: 5px; 
             box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
         }
-        /* Estilo del formulario */
         .formulario {
             display: none; /* Ocultar el formulario inicialmente */
             background: rgba(255, 255, 255, 0.8);
             border-radius: 10px;
-            padding: 20px;
+            padding-top: 60px;
+            padding-bottom: 40px;
+            padding-left: 20px;
+            padding-right: 20px;
             position: absolute;
             width: 70%;
-            height: 70%;
+            height: auto;
             top: 50%;
             left: 60%;
             transform: translate(-50%, -50%);
@@ -125,6 +129,8 @@
             margin: 20px 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            align-items: flex-start;
+            
         }
         .formulario image {
             width: 15%;
@@ -189,32 +195,31 @@
             justify-content: center; 
             align-items: center;
             position: absolute; 
-            top: 40%; 
+            top: 200px; 
             left: 70%;  
         } 
         .frame img { 
             max-width: 98%;
-            max-height: 98%px;
-        }
+            max-height: 98%;
+        }  
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
+            display: none; /* Ocultar el modal por defecto */
+            position: fixed; /* Mantener el modal en la misma posición */
+            z-index: 1; /* Asegurarse de que el modal esté por encima de otros elementos */
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
-            padding-top: 60px;
+            width: 100%; /* Ancho completo */
+            height: 100%; /* Alto completo */
+            overflow: auto; /* Habilitar desplazamiento si es necesario */
+            background-color: rgb(0,0,0); /* Color de fondo negro */
+            background-color: rgba(0,0,0,0.4); /* Fondo negro con opacidad */
         }
         .modal-content {
             background-color: #fefefe;
-            margin: 5% auto; 
+            margin: 15% auto; /* 15% desde la parte superior y centrado */
             padding: 20px;
             border: 1px solid #888;
-            width: 20%;
+            width: 80%; /* Ancho del modal */
         }
         .close {
             color: #aaa;
@@ -226,8 +231,50 @@
         .close:focus {
             color: black;
             text-decoration: none;
-            cursor: pointer;}
-    </style>
+            cursor: pointer;
+        }
+        .qr-code { 
+            width: 100px;
+            height: 100px;
+        }
+        .table-container { 
+            overflow-y: auto; 
+            max-height: 300px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd; 
+            padding: 5px; 
+            text-align: center; 
+            cursor: pointer; 
+        }
+        th {
+            position: -webkit-sticky;
+            position: sticky; 
+            top: 0;
+            background-color: #f2f2f2;
+            z-index: 1;
+        }
+        #loader { 
+            display: none; 
+            border: 16px solid #f3f3f3; 
+            border-top: 16px solid #3498db; 
+            border-radius: 50%; 
+            width: 120px; 
+            height: 120px; 
+            animation: spin 2s linear infinite; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+        } 
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } }
+       </style>
 </head>
 <body>
     <div class="container">
@@ -247,8 +294,8 @@
             <button class="button" onclick="mostrarFormulario('formulario2')" onmouseover="hideDropdown('dropdown1')">ASIGNACIÓN</button>
             <button class="button" onmouseover="showDropdown('dropdown1')">CONSULTA</button>
             <div id="dropdown1" class="dropdown-menu">
-                <button onclick="mostrarFormulario('formulario4')">Bienes Asignados</button>
-                <button onclick="mostrarFormulario('formulario3')">Bienes Disponibles</button>
+                <button onclick="mostrarFormulario('formulario3')">Bienes Asignados</button>
+                <button onclick="mostrarFormulario('formulario4')">Bienes Disponibles</button>
             </div>    
             <button class="button" onclick="mostrarFormulario('formulario5')" onmouseover="hideDropdown('dropdown1')">DESINCORPORACIÓN</button>
             <button class="button" onclick="mostrarFormulario('formulario6')" onmouseover="hideDropdown('dropdown1')" >REPORTE</button>
@@ -292,7 +339,7 @@
                 <select id="gerencias" class="combo-box">
                     <option value="" disabled selected>Selecciona una opción...</option>
                 </select>
-                <label for="asignacion-fecha">Fecha de Asignación</label>
+                <label for="asignacion-fecha" >Fecha de Asignación</label>
                 <input type="date" id="asignacion-fecha" placeholder="Fecha de Asignación">
                 <br><label for="asignacion-codigo">Código de Asignación</label>
                 <input type="text" id="asignacion-codigo" placeholder="Código de Asignación">
@@ -303,43 +350,103 @@
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
             <div id="formulario3" class="formulario"> 
-                <h2>Consulta</h2>
-                 <label for="consulta-fecha">Bienes Disponibles</label>
-                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
-                 <br><button>Enviar</button>
-                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
-             </div>
+                <h2>Consulta de Bienes Asignados</h2>
+                 <label for="palabra">Palabra de búsqueda</label>
+                <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+                <div class="table-container">
+                <table id="asignacionesTable">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarTabla(0)">Id</th>
+                            <th onclick="ordenarTabla(1)">Codigo</th>
+                            <th onclick="ordenarTabla(2)">Fecha de Asignacion</th>
+                            <th onclick="ordenarTabla(3)">Gerencia ID</th>
+                            <th onclick="ordenarTabla(4)">QR Code</th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                    </tbody>
+                </table>
+                </div>
+                <button id="generarReporte" onclick="generarInforme()">Generar Reporte</button>
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+            </div>
              <div id="formulario4" class="formulario"> 
                 <h2>Consulta</h2>
+                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
                  <label for="consulta-fecha">Bienes Asignados</label>
                  <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
                  <br><button>Enviar</button>
                  <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+                 
              </div>
+
              <div id="formulario5" class="formulario"> 
                 <h2>Desincorporación</h2>
-                 <label for="consulta-fecha">Bienes Asignados</label>
-                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
-                 <br><button>Enviar</button>
-                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
-             </div>
-             <div id="formulario6" class="formulario">
-                <h2>Reporte</h2>   
-
+                <label for="palabra">Palabra de búsqueda</label>
+                <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+            
+                <h2>Lista de Productos</h2>
+                <table id="productosTable">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarTabla(0)">Código</th>
+                            <th onclick="ordenarTabla(1)">Producto</th>
+                            <th onclick="ordenarTabla(2)">Marca</th>
+                            <th onclick="ordenarTabla(3)">Descripción</th>
+                            <th onclick="ordenarTabla(4)">Color</th>
+                            <th onclick="ordenarTabla(5)">Gerencia</th>
+                            <th onclick="ordenarTabla(6)">Fecha de Ingreso</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
-     </div>
-     <div id="qrModal" class="modal"> 
-        <div class="modal-content"> 
-            <span class="close">&times;</span> 
-            <img id="qrModalImg" src="" alt="Código QR" style="width: 100%;"> 
-    </div> 
-</div>
-     <script>
+            <div id="reportFrame" class="formulario">
+                <h2>Informe</h2>
+                <p id="reportContent"></p>
+                <button onclick="generarInforme()">Guardar como PDF</button>
+                <button onclick="printReport()">Imprimir</button>
+                <button onclick="closeReport()">Cerrar</button>
+            </div>
+            <form id="formularioInforme" method="post" action="/mi_aplicacion/generar_informe/" style="display:none;"> 
+                {% csrf_token %}
+                <input type="hidden" name="id" id="inputId"> 
+                <input type="hidden" name="codigo" id="inputCodigo"> 
+                <input type="hidden" name="fecha_asignacion" id="inputFechaAsignacion"> 
+                <input type="hidden" name="gerencia_id" id="inputGerenciaID"> 
+                <input type="hidden" name="qr_code" id="inputQRCode"> 
+            </form>
+            <!-- Modal -->
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="cerrarModal()">&times;</span>
+                    <h2>Motivo de Desincorporación</h2>
+                    <textarea id="motivoInput" placeholder="Ingrese el motivo de desincorporación..."></textarea>
+                     <h3>Ubicación Final</h3>
+                    <select id="ubicacionSelect">
+                        <option value="almacen">Almacén</option>
+                        <option value="donacion">Donación</option>
+                        <option value="reciclaje">Reciclaje</option>
+                        <option value="venta">Venta</option>
+                        <!-- Agrega más opciones según sea necesario -->
+                    </select>
+                    <button onclick="enviarDesincorporacion()">Enviar</button>
+                </div>
+            </div>
+        <div id="formulario6" class="formulario"> 
+                <h2>Reporte</h2>
+        </div> 
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    
+    <script>
          function mostrarFormulario(formularioId) {
+             // Ocultar todos los formularios
              const formularios = document.getElementsByClassName('formulario');
              for (let formulario of formularios) {
                  formulario.style.display = 'none';
              }
+ 
+             // Mostrar el formulario seleccionado
              const formularioSeleccionado = document.getElementById(formularioId);
              formularioSeleccionado.style.display = 'block';
          }
@@ -440,8 +547,239 @@
                 } 
             } 
             return cookieValue; }
-    
-    </script>
+            let ordenAscendente = true; // Variable para controlar el orden
+            
+        function filtrarTabla() {
+                const input = document.getElementById('searchInput');
+                const filter = input.value.toLowerCase();
+                const table = document.getElementById('asignacionesTable');
+                const rows = table.getElementsByTagName('tr');
+        
+                for (let i = 1; i < rows.length; i++) { // Comenzar desde 1 para omitir la cabecera
+                    const cells = rows[i].getElementsByTagName('td');
+                    let mostrarFila = false;
+        
+                    // Verificar si el valor de búsqueda está en alguna de las celdas
+                    for (let j = 0; j < cells.length; j++) {
+                        if (cells[j].innerText.toLowerCase().includes(filter)) {
+                            mostrarFila = true;
+                            break;
+                        }
+                    }
+        
+                    // Mostrar u ocultar la fila según el resultado del filtrado
+                    rows[i].style.display = mostrarFila ? '' : 'none';
+                }
+            }
+        function ordenarTabla(columnaIndex) {
+                const table = document.getElementById('productosTable');
+                const rows = Array.from(table.rows).slice(1); // Obtener todas las filas excepto la cabecera
+                const orden = ordenAscendente ? 1 : -1; // Determinar el orden
+        
+                rows.sort((a, b) => {
+                    const celdaA = a.cells[columnaIndex].innerText.toLowerCase();
+                    const celdaB = b.cells[columnaIndex].innerText.toLowerCase();
+        
+                    if (celdaA < celdaB) return -1 * orden;
+                    if (celdaA > celdaB) return 1 * orden;
+                    return 0;
+                });
+        
+                // Reinsertar las filas ordenadas en la tabla
+                rows.forEach(row => table.appendChild(row));
+        
+                // Cambiar el estado del orden para la próxima vez
+                ordenAscendente = !ordenAscendente;
+            }
+        function abrirModal(fila) {
+                const modal = document.getElementById('modal');
+                const motivoInput = document.getElementById('motivoInput');
+                const ubicacionSelect = document.getElementById('ubicacionSelect');
+
+                // Limpiar los campos del modal
+                motivoInput.value = '';
+                ubicacionSelect.selectedIndex = 0;
+
+                // Mostrar el modal
+                modal.style.display = "block";
+            }
+
+        function cerrarModal() {
+                const modal = document.getElementById('modal');
+                modal.style.display = "none";
+            }
+
+        function enviarDesincorporacion() {
+                const motivo = document.getElementById('motivoInput').value;
+                const ubicacion = document.getElementById('ubicacionSelect').value;
+
+                // Aquí puedes agregar la lógica para manejar el motivo y la ubicación
+                console.log(`Motivo: ${motivo}, Ubicación: ${ubicacion}`);
+
+                // Cerrar el modal después de enviar
+                cerrarModal();
+            }
+
+                // Cerrar el modal si se hace clic fuera de él
+                window.onclick = function(event) {
+                    const modal = document.getElementById('modal');
+                    if (event.target == modal) {
+                        cerrarModal();
+                    }
+                }   
+        
+        document.addEventListener("DOMContentLoaded", function() { 
+            const table = document.getElementById('asignacionesTable'); 
+            table.addEventListener('click', function(event) { 
+                const target = event.target; 
+                if (target.tagName === 'TD') { 
+                    const row = target.parentNode; generateReport(row); 
+                } 
+            }); 
+        });        
+        document.addEventListener("DOMContentLoaded", function() { 
+            fetch('/mi_aplicacion/obtener_asignaciones/') 
+            .then(response => response.json()) 
+            .then(data => { 
+                const tabla = document.getElementById('asignacionesTable').getElementsByTagName('tbody')[0]; 
+                data.forEach(asignacion => { 
+                    const fila = tabla.insertRow(); 
+                    fila.insertCell(0).textContent = asignacion.id; 
+                    fila.insertCell(1).textContent = asignacion.codigo; 
+                    fila.insertCell(2).textContent = asignacion.fecha_asignacion; 
+                    fila.insertCell(3).textContent = asignacion.gerencia_id; 
+                    fila.insertCell(4).innerHTML = `<img src="data:image/png;base64,${asignacion.qr_code}" class="qr-code" alt="QR Code">`; 
+            });
+            }) 
+            .catch(error => console.error('Error al obtener las asignaciones:', error));
+         });
+         let selectedRowData = {};
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const table = document.getElementById('asignacionesTable');
+            table.addEventListener('click', function(event) {
+                const target = event.target;
+                if (target.tagName === 'TD') {
+                    const row = target.parentNode;
+                    generateReport(row);
+                }
+            });
+        });
+
+        function generateReport(row) {
+            const cells = row.getElementsByTagName('td');
+            selectedRowData = {
+                id: cells[0].textContent,
+                codigo: cells[1].textContent,
+                fecha_asignacion: cells[2].textContent,
+                gerencia_id: cells[3].textContent,
+                qr_code: cells[4].querySelector('img').src
+            };
+
+            document.getElementById('reportContent').innerHTML = `
+                <img src="/static/cintillo2.png" style="width: 100%; height: auto; border: 5px;"><br><br>
+                <br><label style="text-aling: left; font-size: 20; ">DETALLES DEL BIEN NACIONAL</label><br>
+                <br><strong>ID:</strong> ${selectedRowData.id}<br>
+                <strong>Código:</strong> ${selectedRowData.codigo}<br>
+                <strong>Fecha de Asignación:</strong> ${selectedRowData.fecha_asignacion}<br>
+                <strong>Gerencia ID:</strong> ${selectedRowData.gerencia_id}<br>
+                <strong>QR Code:</strong><br>
+                <img src="${selectedRowData.qr_code}" style="width: 100px; height: auto;">
+            `;
+            document.getElementById('reportFrame').style.display = 'block';
+        }
+
+        function closeReport() {
+            document.getElementById('reportFrame').style.display = 'none';
+        }
+        function generarInforme() { 
+            document.getElementById('inputId').value = selectedRowData.id; 
+            document.getElementById('inputCodigo').value = selectedRowData.codigo; 
+            document.getElementById('inputFechaAsignacion').value = selectedRowData.fecha_asignacion; 
+            document.getElementById('inputGerenciaID').value = selectedRowData.gerencia_id; 
+            document.getElementById('inputQRCode').value = selectedRowData.qr_code
+            document.getElementById('formularioInforme').submit(); 
+        }
+        
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const reportContent = document.getElementById('reportContent').innerText;
+            doc.text(reportContent, 10, 10);
+            doc.save('informe.pdf');
+            
+        }
+
+        function printReport() {
+            const reportContent = document.getElementById('reportContent').innerHTML;
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write('<html><head><title>Informe</title></head><body>');
+            printWindow.document.write(reportContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function filtrarTabla() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("asignacionesTable");
+            const tr = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < tr.length; i++) {
+                let td = tr[i].getElementsByTagName("td");
+                let showRow = false;
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j] && td[j].innerText.toLowerCase().indexOf(filter) > -1) {
+                        showRow = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = showRow ? "" : "none";
+            }
+        }
+
+        function ordenarTabla(n) {
+            const table = document.getElementById("asignacionesTable");
+            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            switching = true;
+            dir = "asc";
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                    if (dir === "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount === 0 && dir === "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+     </script>
  </body>
  </html>
                
