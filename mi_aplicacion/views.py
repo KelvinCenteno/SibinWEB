@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from .db import validar_usuario, obtener_gerencias, almacenar_asignacion, obtener_productos, Consulta_Bienes_Asignados
+from .db import validar_usuario, obtener_gerencias, almacenar_asignacion, obtener_productos, Consulta_Bienes_Asignados, consulta_disponibles
 import qrcode
 from io import BytesIO
 import base64
@@ -119,15 +119,20 @@ def generar_informe_view(request):
         codigo = request.POST.get('codigo')
         fecha_asignacion = request.POST.get('fecha_asignacion')
         gerencia_id = request.POST.get('gerencia_id')
-        hora_actual = datetime.now().strftime("%H:%M:%S")
+
+        # Declaraciones de depuración para verificar los valores recibidos
+        print(f"ID: {id}")
+        print(f"Código: {codigo}")
+        print(f"Fecha de Asignación: {fecha_asignacion}")
+        print(f"Gerencia ID: {gerencia_id}")
 
         datos = {
             "{{ID}}": id,
             "{{Codigo}}": codigo,
             "{{FechaAsignacion}}": fecha_asignacion,
-            "{{GerenciaID}}": gerencia_id,
-            "{{hora}}": hora_actual
+            "{{GerenciaID}}": gerencia_id
         }
+        print(f"Datos: {datos}")
 
         qr_code = request.POST.get('qr_code')
         if qr_code:
@@ -156,3 +161,22 @@ def generar_informe_view(request):
             print("Error: QR Code no recibido.")
         
     return HttpResponse("Método no permitido", status=405)
+
+
+def consulta_registros_view(request):
+    disponibles = consulta_disponibles()
+    # Añadir un print para verificar los datos
+    disponibles_lista = [
+        {
+            'id_Registro': disponibles[0],
+            'marca': disponibles[1],
+            'producto': disponibles[2],
+            'color': disponibles[3],
+            'serial': disponibles[4],
+            'fecha_registro': disponibles[5],
+            'categoria': disponibles[6],
+            'cantidad': disponibles[8],
+        }
+        for disponibles in disponibles
+    ]
+    return JsonResponse(disponibles_lista, safe=False)

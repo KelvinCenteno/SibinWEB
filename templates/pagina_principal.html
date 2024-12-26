@@ -237,6 +237,10 @@
             width: 100px;
             height: 100px;
         }
+        .qr-code2 { 
+            width: 50px;
+            height: 50px;
+        }
         .table-container { 
             overflow-y: auto; 
             max-height: 300px; }
@@ -308,7 +312,6 @@
                 Tu navegador no soporta la etiqueta de video. 
             </video> 
         </div>
-        <!-- Formulario -->
         <div id="formularios">
             <div id="formulario1" class="formulario"> 
                 <h2>Registro de Bienes Nacionales</h2> 
@@ -351,7 +354,7 @@
             </div>
             <div id="formulario3" class="formulario"> 
                 <h2>Consulta de Bienes Asignados</h2>
-                 <label for="palabra">Palabra de búsqueda</label>
+                <label for="palabra">Palabra de búsqueda</label>
                 <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
                 <div class="table-container">
                 <table id="asignacionesTable">
@@ -360,7 +363,7 @@
                             <th onclick="ordenarTabla(0)">Id</th>
                             <th onclick="ordenarTabla(1)">Codigo</th>
                             <th onclick="ordenarTabla(2)">Fecha de Asignacion</th>
-                            <th onclick="ordenarTabla(3)">Gerencia ID</th>
+                            <th onclick="ordenarTabla(3)">Gerencia</th>
                             <th onclick="ordenarTabla(4)">QR Code</th>
                         </tr>
                     </thead>
@@ -372,12 +375,29 @@
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
              <div id="formulario4" class="formulario"> 
-                <h2>Consulta</h2>
-                 <!-- Aquí puedes agregar los campos necesarios para este formulario -->
-                 <label for="consulta-fecha">Bienes Asignados</label>
-                 <input type="text" id="consulta-fecha" placeholder="Fecha de Consulta">
-                 <br><button>Enviar</button>
-                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+                <h2>Consulta de Bienes Disponibles</h2>
+                <label for="palabra">Palabra de búsqueda</label>
+                <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+                <div class="table-container">
+                <table id="DisponiblesTable">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarTabla(0)">Id</th>
+                            <th onclick="ordenarTabla(1)">Marca</th>
+                            <th onclick="ordenarTabla(2)">Producto</th>
+                            <th onclick="ordenarTabla(3)">Color</th>
+                            <th onclick="ordenarTabla(4)">Serial</th>
+                            <th onclick="ordenarTabla(5)">Fecha de Registro</th>
+                            <th onclick="ordenarTabla(6)">Categoria</th>
+                            <th onclick="ordenarTabla(7)">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                    </tbody>
+                </table>
+                </div>
+                <button id="generarReporte" onclick="generarInforme()">Generar Reporte</button>
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
                  
              </div>
 
@@ -458,12 +478,6 @@
              }
          }
  
-         function highlight(element) {
-             element.classList.add('highlight');
-             setTimeout(() => {
-                 element.classList.remove('highlight');
-             }, 500);
-         }
          function showDropdown(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
             dropdown.style.display = 'flex';
@@ -549,49 +563,7 @@
             return cookieValue; }
             let ordenAscendente = true; // Variable para controlar el orden
             
-        function filtrarTabla() {
-                const input = document.getElementById('searchInput');
-                const filter = input.value.toLowerCase();
-                const table = document.getElementById('asignacionesTable');
-                const rows = table.getElementsByTagName('tr');
-        
-                for (let i = 1; i < rows.length; i++) { // Comenzar desde 1 para omitir la cabecera
-                    const cells = rows[i].getElementsByTagName('td');
-                    let mostrarFila = false;
-        
-                    // Verificar si el valor de búsqueda está en alguna de las celdas
-                    for (let j = 0; j < cells.length; j++) {
-                        if (cells[j].innerText.toLowerCase().includes(filter)) {
-                            mostrarFila = true;
-                            break;
-                        }
-                    }
-        
-                    // Mostrar u ocultar la fila según el resultado del filtrado
-                    rows[i].style.display = mostrarFila ? '' : 'none';
-                }
-            }
-        function ordenarTabla(columnaIndex) {
-                const table = document.getElementById('productosTable');
-                const rows = Array.from(table.rows).slice(1); // Obtener todas las filas excepto la cabecera
-                const orden = ordenAscendente ? 1 : -1; // Determinar el orden
-        
-                rows.sort((a, b) => {
-                    const celdaA = a.cells[columnaIndex].innerText.toLowerCase();
-                    const celdaB = b.cells[columnaIndex].innerText.toLowerCase();
-        
-                    if (celdaA < celdaB) return -1 * orden;
-                    if (celdaA > celdaB) return 1 * orden;
-                    return 0;
-                });
-        
-                // Reinsertar las filas ordenadas en la tabla
-                rows.forEach(row => table.appendChild(row));
-        
-                // Cambiar el estado del orden para la próxima vez
-                ordenAscendente = !ordenAscendente;
-            }
-        function abrirModal(fila) {
+       function abrirModal(fila) {
                 const modal = document.getElementById('modal');
                 const motivoInput = document.getElementById('motivoInput');
                 const ubicacionSelect = document.getElementById('ubicacionSelect');
@@ -627,16 +599,7 @@
                         cerrarModal();
                     }
                 }   
-        
-        document.addEventListener("DOMContentLoaded", function() { 
-            const table = document.getElementById('asignacionesTable'); 
-            table.addEventListener('click', function(event) { 
-                const target = event.target; 
-                if (target.tagName === 'TD') { 
-                    const row = target.parentNode; generateReport(row); 
-                } 
-            }); 
-        });        
+    
         document.addEventListener("DOMContentLoaded", function() { 
             fetch('/mi_aplicacion/obtener_asignaciones/') 
             .then(response => response.json()) 
@@ -649,6 +612,26 @@
                     fila.insertCell(2).textContent = asignacion.fecha_asignacion; 
                     fila.insertCell(3).textContent = asignacion.gerencia_id; 
                     fila.insertCell(4).innerHTML = `<img src="data:image/png;base64,${asignacion.qr_code}" class="qr-code" alt="QR Code">`; 
+            });
+            }) 
+            .catch(error => console.error('Error al obtener las asignaciones:', error));
+         });
+
+         document.addEventListener("DOMContentLoaded", function() { 
+            fetch('/mi_aplicacion/consulta_disponibles/') 
+            .then(response => response.json()) 
+            .then(data => { 
+                const tabla = document.getElementById('DisponiblesTable').getElementsByTagName('tbody')[0]; 
+                data.forEach(disponibles => { 
+                    const fila = tabla.insertRow(); 
+                    fila.insertCell(0).textContent = disponibles.id_Registro; 
+                    fila.insertCell(1).textContent = disponibles.marca; 
+                    fila.insertCell(2).textContent = disponibles.producto; 
+                    fila.insertCell(3).textContent = disponibles.color; 
+                    fila.insertCell(4).innerHTML = disponibles.serial; 
+                    fila.insertCell(5).innerHTML = disponibles.fecha_registro; 
+                    fila.insertCell(6).innerHTML = disponibles.categoria; 
+                    fila.insertCell(7).innerHTML = disponibles.cantidad; 
             });
             }) 
             .catch(error => console.error('Error al obtener las asignaciones:', error));
@@ -699,16 +682,6 @@
             document.getElementById('inputGerenciaID').value = selectedRowData.gerencia_id; 
             document.getElementById('inputQRCode').value = selectedRowData.qr_code
             document.getElementById('formularioInforme').submit(); 
-        }
-        
-        function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            const reportContent = document.getElementById('reportContent').innerText;
-            doc.text(reportContent, 10, 10);
-            doc.save('informe.pdf');
-            
         }
 
         function printReport() {

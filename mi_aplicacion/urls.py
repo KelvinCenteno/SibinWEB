@@ -1,6 +1,7 @@
 # mi_aplicacion/urls.py
 from django.urls import path
 from .views import get_gerencias, generar_qr_y_guardar, obtener_productos_view, obtener_asignaciones_view, generar_informe_view
+from .views import consulta_registros_view
 
 urlpatterns = [
    path('get_gerencias/', get_gerencias, name='get_gerencias'),
@@ -8,4 +9,6 @@ urlpatterns = [
    path('obtener_productos/', obtener_productos_view, name='obtener_productos'),
    path('obtener_asignaciones/', obtener_asignaciones_view, name='obtener_asignaciones'),
    path('generar_informe/', generar_informe_view, name='generar_informe'),
+   path('consulta_disponibles/', consulta_registros_view, name='consulta_disponibles'),
+
 ]

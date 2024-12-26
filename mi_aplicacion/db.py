@@ -42,7 +42,7 @@ def obtener_gerencias():
 
     try:
         cursor = conexion.cursor()
-        query = "SELECT id, nombre FROM Gerencia"  # Ajusta los nombres de columna según tu tabla
+        query = "SELECT id, nombre FROM Gerencia"  
         cursor.execute(query)
         gerencias = cursor.fetchall()
         cursor.close()
@@ -102,7 +102,8 @@ def Consulta_Bienes_Asignados():
     try:
         cursor = conexion.cursor()
         query = """
-        SELECT id, codigo, fecha_asignacion, gerencia_id, qr_code FROM Asignacion
+        SELECT a.id, a.codigo, a.fecha_Asignacion, g.nombre AS gerencia, a.qr_code FROM asignacion a 
+        JOIN gerencia g ON a.gerencia_id = g.id
         """
         cursor.execute(query)
         asignaciones = cursor.fetchall()
@@ -111,10 +112,30 @@ def Consulta_Bienes_Asignados():
         asignaciones_convertidas = [] 
         for asignacion in asignaciones: 
             asignacion_convertida = list(asignacion) 
-            if asignacion_convertida[4]: # qr_code es el quinto campo 
+            if asignacion_convertida[4]: 
                 asignacion_convertida[4] = base64.b64encode(asignacion_convertida[4]).decode('utf-8') 
                 asignaciones_convertidas.append(asignacion_convertida) 
         return asignaciones_convertidas
     except Exception as e:
         print(f"Error al obtener asiganciones: {e}")
+        return []
+
+def consulta_disponibles():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = """SELECT r.Id_Registro, m.Nombre AS Marca, r.Producto, r.Color, r.Serial, r.Fecha_Registro, 
+        c.categoria AS Categoria, r.Foto, r.Cantidad FROM Registro r 
+        JOIN Marca m ON r.Marca = m.Id
+        JOIN Categoria c ON r.Categoria = c.Id;"""  
+        cursor.execute(query)
+        disponibles = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return disponibles
+    except Exception as e:
+        print(f"Error al obtener Bienes Disponibles: {e}")
         return []
