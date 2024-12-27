@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from .db import validar_usuario, obtener_gerencias, almacenar_asignacion, obtener_productos, Consulta_Bienes_Asignados, consulta_disponibles
+from .db import *
 import qrcode
 from io import BytesIO
 import base64
@@ -40,8 +40,9 @@ def generar_qr_y_guardar(request):
         codigo = request.POST.get('codigo')
         fecha_asignacion = request.POST.get('fecha_asignacion')
         gerencia_id = request.POST.get('gerencia_id')
-        
-        datos = f"Código de Asignación: {codigo}\nFecha de Asignación: {fecha_asignacion}\nGerencia: {gerencia_id}"
+        gerencia_name = request.POST.get('gerencia_nombre')
+
+        datos= f"Código de Asignación: {codigo}\nFecha de Asignación: {fecha_asignacion}\nGerencia: {gerencia_name}"
         
         qr = qrcode.QRCode(
             version=1,
@@ -119,24 +120,16 @@ def generar_informe_view(request):
         codigo = request.POST.get('codigo')
         fecha_asignacion = request.POST.get('fecha_asignacion')
         gerencia_id = request.POST.get('gerencia_id')
-
-        # Declaraciones de depuración para verificar los valores recibidos
-        print(f"ID: {id}")
-        print(f"Código: {codigo}")
-        print(f"Fecha de Asignación: {fecha_asignacion}")
-        print(f"Gerencia ID: {gerencia_id}")
-
         datos = {
             "{{ID}}": id,
             "{{Codigo}}": codigo,
             "{{FechaAsignacion}}": fecha_asignacion,
             "{{GerenciaID}}": gerencia_id
         }
-        print(f"Datos: {datos}")
+        
 
         qr_code = request.POST.get('qr_code')
         if qr_code:
-            print("QR Code recibido:", qr_code)  # Declaración de depuración
             qr_code_parts = qr_code.split(',')
             if len(qr_code_parts) > 1:
                 qr_code_base64 = qr_code_parts[1]
@@ -165,7 +158,6 @@ def generar_informe_view(request):
 
 def consulta_registros_view(request):
     disponibles = consulta_disponibles()
-    # Añadir un print para verificar los datos
     disponibles_lista = [
         {
             'id_Registro': disponibles[0],
@@ -180,3 +172,27 @@ def consulta_registros_view(request):
         for disponibles in disponibles
     ]
     return JsonResponse(disponibles_lista, safe=False)
+
+def consulta_desincorporacion_view(request):
+    desincorporacion = consulta_desincorporacion()
+    desincorporacion_lista = [
+        {
+            'id': desincorporacion[0],
+            'codigo_bien': desincorporacion[1],
+            'gerencia': desincorporacion[2],
+            'fecha_asignacion': desincorporacion[3],
+            'motivo_retiro': desincorporacion[4],
+            'fecha_retiro': desincorporacion[5],
+            'ubicacion_final': desincorporacion[7],
+        }
+        for desincorporacion in desincorporacion
+    ] 
+    return JsonResponse(desincorporacion_lista, safe=False)
+
+def get_categorias(request):
+    categorias = obtener_categorias()
+    return JsonResponse(categorias, safe=False)
+
+def get_marcas(request):
+    marcas = obtener_marcas()
+    return JsonResponse(marcas, safe=False)

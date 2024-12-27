@@ -139,3 +139,70 @@ def consulta_disponibles():
     except Exception as e:
         print(f"Error al obtener Bienes Disponibles: {e}")
         return []
+
+def consulta_desincorporacion():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = """SELECT 
+        d.Id_Des, 
+        a.codigo AS codigo_bien, 
+        g.nombre AS Gerencia, 
+        a.fecha_Asignacion,
+        d.motivo_retiro,
+        d.fecha_retiro,
+        a.qr_code, 
+        (al.estado || ', ' || al.municipio || ', ' || al.parroquia || ', ' || al.lugar) AS Ubicacion_Final 
+        FROM 
+        Desincorporacion d 
+        JOIN 
+        Asignacion a ON d.Bien_Retirar = a.Id 
+        JOIN 
+        Gerencia g ON a.gerencia_id = g.id
+        JOIN 
+        Almacen al ON CAST(d.ubicación_final AS INTEGER) = al.id;"""  
+        cursor.execute(query)
+        desincorporacion= cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return desincorporacion
+    except Exception as e:
+        print(f"Error al obtener Bienes desincorporados: {e}")
+        return []
+
+def obtener_categorias():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = "SELECT id, categoria FROM categoria"  
+        cursor.execute(query)
+        categorias = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return categorias
+    except Exception as e:
+        print(f"Error al obtener categorias: {e}")
+        return []
+    
+def obtener_marcas():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = "SELECT id, nombre FROM marca"  
+        cursor.execute(query)
+        marcas = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return marcas
+    except Exception as e:
+        print(f"Error al obtener marcas: {e}")
+        return []

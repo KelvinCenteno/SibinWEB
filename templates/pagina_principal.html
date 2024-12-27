@@ -301,8 +301,8 @@
                 <button onclick="mostrarFormulario('formulario3')">Bienes Asignados</button>
                 <button onclick="mostrarFormulario('formulario4')">Bienes Disponibles</button>
             </div>    
-            <button class="button" onclick="mostrarFormulario('formulario5')" onmouseover="hideDropdown('dropdown1')">DESINCORPORACIÓN</button>
-            <button class="button" onclick="mostrarFormulario('formulario6')" onmouseover="hideDropdown('dropdown1')" >REPORTE</button>
+            <button class="button" onclick="mostrarFormulario('formulario6')" onmouseover="hideDropdown('dropdown1')">DESINCORPORACIÓN</button>
+            <button class="button" onclick="mostrarFormulario('formulario5')" onmouseover="hideDropdown('dropdown1')" >REPORTE</button>
         </div>
         <div class="video-container" onmouseover="hideDropdown('dropdown1')"> 
             <video autoplay muted loop>
@@ -315,13 +315,15 @@
         <div id="formularios">
             <div id="formulario1" class="formulario"> 
                 <h2>Registro de Bienes Nacionales</h2> 
-                <label for="codigo">Código</label> 
-                <input type="text" id="codigo" placeholder="Codigo">
-                <label for="categoria">Categoría</label> 
-                <input type="text" id="categoria" placeholder="Categoria">
-                <label for="marca">Marca</label> 
-                <input type="text" id="marca" placeholder="Marca">
-                <br><label for="producto">Producto</label>
+                <label>Categorias</label>
+                <select id="categorias" class="combo-box">
+                    <option value="" disabled selected></option>
+                </select>
+                <label>Marca</label> 
+                <select id="marcas" class="combo-box">
+                    <option value="" disabled selected></option>
+                </select>
+                <br><label>Producto</label>
                 <input type="text" id="producto" placeholder="Producto">
                 <label for="color">Color</label> 
                 <input type="text" id="color" placeholder="Color"> 
@@ -330,7 +332,7 @@
                 <br><label for="fecha_registro">Fecha de Registro</label> 
                 <input type="date" id="fecha_registro" placeholder="Fecha de Registro">
                 <label for="cant">Cantidad</label>
-                <input type="text" id="cantidad" placeholder="Cantidad">
+                <input type="number" id="cantidad" min="1" placeholder="Cantidad">
                 <label for="imagen">Imagen</label> 
                 <input type="file" id="imagen"> 
                 <br><button>Enviar</button> 
@@ -355,7 +357,7 @@
             <div id="formulario3" class="formulario"> 
                 <h2>Consulta de Bienes Asignados</h2>
                 <label for="palabra">Palabra de búsqueda</label>
-                <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+                <input type="text" id="searchInput" onkeyup="filtrarTabla('asignacionesTable', 'searchInput')" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
                 <div class="table-container">
                 <table id="asignacionesTable">
                     <thead>
@@ -371,13 +373,13 @@
                     </tbody>
                 </table>
                 </div>
-                <button id="generarReporte" onclick="generarInforme()">Generar Reporte</button>
+                <button id="actualizar">Actualizar</button>
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
              <div id="formulario4" class="formulario"> 
                 <h2>Consulta de Bienes Disponibles</h2>
                 <label for="palabra">Palabra de búsqueda</label>
-                <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+                <input type="text" id="searchInput" onkeyup="filtrarTabla('DisponiblesTable', 'searchInput')" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
                 <div class="table-container">
                 <table id="DisponiblesTable">
                     <thead>
@@ -402,30 +404,33 @@
              </div>
 
              <div id="formulario5" class="formulario"> 
-                <h2>Desincorporación</h2>
+                <h2>Reporte de Desincorporación</h2>
                 <label for="palabra">Palabra de búsqueda</label>
-                <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
-            
-                <h2>Lista de Productos</h2>
-                <table id="productosTable">
+                <input type="text" id="searchInput2" onkeyup="filtrarTabla('asignacionesTable', 'searchInput2')" placeholder="Buscar por palabra clave..." >
+                <div class="table-container">
+                <table id="DesincorporacionTable">
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabla(0)">Código</th>
-                            <th onclick="ordenarTabla(1)">Producto</th>
-                            <th onclick="ordenarTabla(2)">Marca</th>
-                            <th onclick="ordenarTabla(3)">Descripción</th>
-                            <th onclick="ordenarTabla(4)">Color</th>
-                            <th onclick="ordenarTabla(5)">Gerencia</th>
-                            <th onclick="ordenarTabla(6)">Fecha de Ingreso</th>
+                            <th onclick="ordenarTabla(0)">Id</th>
+                            <th onclick="ordenarTabla(1)">Codigo del Bien</th>
+                            <th onclick="ordenarTabla(2)">Gerencia</th>
+                            <th onclick="ordenarTabla(3)">Fecha asignacion</th>
+                            <th onclick="ordenarTabla(4)">Motivo de Retiro</th>
+                            <th onclick="ordenarTabla(5)">Fecha de Retiro</th>
+                            <th onclick="ordenarTabla(6)">Ubicacion Final</th>
                         </tr>
                     </thead>
+                    <tbody> 
+                    </tbody>
                 </table>
+                </div>
+                <button id="generarReporte" onclick="generarInforme()">Generar Reporte</button>
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
             <div id="reportFrame" class="formulario">
                 <h2>Informe</h2>
                 <p id="reportContent"></p>
                 <button onclick="generarInforme()">Guardar como PDF</button>
-                <button onclick="printReport()">Imprimir</button>
                 <button onclick="closeReport()">Cerrar</button>
             </div>
             <form id="formularioInforme" method="post" action="/mi_aplicacion/generar_informe/" style="display:none;"> 
@@ -455,6 +460,24 @@
             </div>
         <div id="formulario6" class="formulario"> 
                 <h2>Reporte</h2>
+                <label for="palabra">Palabra de búsqueda</label>
+                <input type="text" id="searchInput3" onkeyup="filtrarTabla('reporteTable', 'searchInput3')"  placeholder="Buscar por palabra clave..." >
+                <div class="table-container">
+                    <table id="reporteTable">
+                        <thead>
+                            <tr>
+                                <th onclick="ordenarTabla(0)">Id</th>
+                                <th onclick="ordenarTabla(1)">Producto</th>
+                                <th onclick="ordenarTabla(2)">Gerencia</th>
+                                <th onclick="ordenarTabla(3)">Fecha de Asignacion</th>
+                            </tr>
+                        </thead>
+                        <tbody> 
+                        </tbody>
+                    </table>
+                    </div>
+                    <button id="actualizar">Actualizar</button>
+                    <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
         </div> 
      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     
@@ -497,26 +520,67 @@
                 const newOption = document.createElement('option'); 
                 newOption.value = gerencia[0]; 
                 newOption.textContent = gerencia[1];
+                newOption.dataset.name = gerencia[1];
                 comboBox.appendChild(newOption); 
             }); 
+
         }) 
         .catch(error => { 
             console.error('Error al cargar las opciones:', error); 
             document.getElementById('gerencias').innerHTML = '<option value="">Error al cargar opciones</option>'; 
         });
      }); 
+     document.addEventListener("DOMContentLoaded", function() 
+        { fetch('/mi_aplicacion/get_categorias/') 
+        .then(response => response.json()) 
+        .then(data => { 
+            const comboBox = document.getElementById('categorias'); 
+            comboBox.innerHTML = ''; 
+            data.forEach(categoria => { 
+                const newOption = document.createElement('option'); 
+                newOption.value = categoria[0]; 
+                newOption.textContent = categoria[1];
+                comboBox.appendChild(newOption); 
+            }); 
+        }) 
+        .catch(error => { 
+            console.error('Error al cargar las opciones:', error); 
+            document.getElementById('categorias').innerHTML = '<option value="">Error al cargar opciones</option>'; 
+        });
+     }); 
+     document.addEventListener("DOMContentLoaded", function() 
+        { fetch('/mi_aplicacion/get_marcas/') 
+        .then(response => response.json()) 
+        .then(data => { 
+            const comboBox = document.getElementById('marcas'); 
+            comboBox.innerHTML = ''; 
+            data.forEach(marcas => { 
+                const newOption = document.createElement('option'); 
+                newOption.value = marcas[0]; 
+                newOption.textContent = marcas[1];
+                comboBox.appendChild(newOption); 
+            }); 
+        }) 
+        .catch(error => { 
+            console.error('Error al cargar las opciones:', error); 
+            document.getElementById('marcas').innerHTML = '<option value="">Error al cargar opciones</option>'; 
+        });
+     });
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('enviarAsignacion').addEventListener('click', function(event) {
                 event.preventDefault();  // Evitar que el formulario se envíe automáticamente
 
                 const codigo = document.getElementById('asignacion-codigo').value;
                 const fechaAsignacion = document.getElementById('asignacion-fecha').value;
-                const gerenciaId = document.getElementById('gerencias').value;
+                const gerenciaSelect = document.getElementById('gerencias');
+                const gerenciaId = gerenciaSelect.value;
+                const gerenciaNombre = gerenciaSelect.options[gerenciaSelect.selectedIndex].dataset.name;
                 
                 const formData = new FormData();
                 formData.append('codigo', codigo);
                 formData.append('fecha_asignacion', fechaAsignacion);
                 formData.append('gerencia_id', gerenciaId);
+                formData.append('gerencia_nombre', gerenciaNombre);
                 formData.append('csrfmiddlewaretoken', getCookie('csrftoken')); // Añadir token CSRF
 
                 fetch('/mi_aplicacion/generar_qr_y_guardar/', {
@@ -593,29 +657,58 @@
             }
 
                 // Cerrar el modal si se hace clic fuera de él
-                window.onclick = function(event) {
+        window.onclick = function(event) {
                     const modal = document.getElementById('modal');
                     if (event.target == modal) {
                         cerrarModal();
                     }
                 }   
-    
-        document.addEventListener("DOMContentLoaded", function() { 
-            fetch('/mi_aplicacion/obtener_asignaciones/') 
-            .then(response => response.json()) 
-            .then(data => { 
-                const tabla = document.getElementById('asignacionesTable').getElementsByTagName('tbody')[0]; 
-                data.forEach(asignacion => { 
-                    const fila = tabla.insertRow(); 
-                    fila.insertCell(0).textContent = asignacion.id; 
-                    fila.insertCell(1).textContent = asignacion.codigo; 
-                    fila.insertCell(2).textContent = asignacion.fecha_asignacion; 
-                    fila.insertCell(3).textContent = asignacion.gerencia_id; 
-                    fila.insertCell(4).innerHTML = `<img src="data:image/png;base64,${asignacion.qr_code}" class="qr-code" alt="QR Code">`; 
-            });
-            }) 
-            .catch(error => console.error('Error al obtener las asignaciones:', error));
-         });
+                
+        document.addEventListener('DOMContentLoaded', function() {
+            function actualizarAsignaciones() {
+                fetch('/mi_aplicacion/obtener_asignaciones/')
+                .then(response => response.json())
+                .then(data => {
+                    const tabla = document.getElementById('asignacionesTable').getElementsByTagName('tbody')[0];
+                    tabla.innerHTML = '';  // Limpiar tabla
+                    data.forEach(asignacion => {
+                        const fila = tabla.insertRow();
+                        fila.insertCell(0).textContent = asignacion.id; 
+                        fila.insertCell(1).textContent = asignacion.codigo; 
+                        fila.insertCell(2).textContent = asignacion.fecha_asignacion; 
+                        fila.insertCell(3).textContent = asignacion.gerencia_id; 
+                        fila.insertCell(4).innerHTML = `<img src="data:image/png;base64,${asignacion.qr_code}" class="qr-code" alt="QR Code">`; 
+                    });
+                })
+                .catch(error => console.error('Error al obtener las asignaciones:', error));
+            }
+            document.getElementById('actualizar').addEventListener('click', actualizarAsignaciones); 
+            
+            actualizarAsignaciones();
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            function actualizarReporte() {
+                fetch('/mi_aplicacion/obtener_asignaciones/')
+                .then(response => response.json())
+                .then(data => {
+                    const tabla = document.getElementById('reporteTable').getElementsByTagName('tbody')[0];
+                    tabla.innerHTML = '';  // Limpiar tabla
+                    data.forEach(reporte => {
+                        const fila = tabla.insertRow();
+                        fila.insertCell(0).textContent = reporte.id; 
+                        fila.insertCell(1).textContent = reporte.codigo; 
+                        fila.insertCell(2).textContent = reporte.gerencia_id; 
+                        fila.insertCell(3).textContent = reporte.fecha_asignacion; 
+                        
+                    });
+                })
+                .catch(error => console.error('Error al obtener las asignaciones:', error));
+            }
+            document.getElementById('actualizar').addEventListener('click', actualizarReporte); 
+            
+            actualizarReporte();
+        });
+        
 
          document.addEventListener("DOMContentLoaded", function() { 
             fetch('/mi_aplicacion/consulta_disponibles/') 
@@ -634,7 +727,26 @@
                     fila.insertCell(7).innerHTML = disponibles.cantidad; 
             });
             }) 
-            .catch(error => console.error('Error al obtener las asignaciones:', error));
+            .catch(error => console.error('Error al obtener los disponibles:', error));
+         });
+
+         document.addEventListener("DOMContentLoaded", function() { 
+            fetch('/mi_aplicacion/consulta_desincorporacion/') 
+            .then(response => response.json()) 
+            .then(data => { 
+                const tabla = document.getElementById('DesincorporacionTable').getElementsByTagName('tbody')[0]; 
+                data.forEach(desincorporados => { 
+                    const fila = tabla.insertRow(); 
+                    fila.insertCell(0).textContent = desincorporados.id; 
+                    fila.insertCell(1).textContent = desincorporados.codigo_bien; 
+                    fila.insertCell(2).textContent = desincorporados.gerencia; 
+                    fila.insertCell(3).textContent = desincorporados.fecha_asignacion; 
+                    fila.insertCell(4).textContent = desincorporados.motivo_retiro; 
+                    fila.insertCell(5).textContent = desincorporados.fecha_retiro; 
+                    fila.insertCell(6).textContent = desincorporados.ubicacion_final;  
+            });
+            }) 
+            .catch(error => console.error('Error al obtener las desincorporaciones:', error));
          });
          let selectedRowData = {};
 
@@ -694,10 +806,10 @@
             printWindow.print();
         }
 
-        function filtrarTabla() {
-            const input = document.getElementById("searchInput");
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById("asignacionesTable");
+        function filtrarTabla(tableId, inputId) { 
+            const input = document.getElementById(inputId); 
+            const filter = input.value.toLowerCase(); 
+            const table = document.getElementById(tableId); 
             const tr = table.getElementsByTagName("tr");
 
             for (let i = 1; i < tr.length; i++) {
