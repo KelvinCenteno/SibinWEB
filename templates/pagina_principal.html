@@ -266,7 +266,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr onclick="abrirModal(this)">
                             <td>001</td>
                             <td>Producto A</td>
                             <td>Marca X</td>
@@ -275,7 +275,7 @@
                             <td>Gerencia 1</td>
                             <td>2023-01-01</td>
                         </tr>
-                        <tr>
+                        <tr onclick="abrirModal(this)">
                             <td>002</td>
                             <td>Producto B</td>
                             <td>Marca Y</td>
@@ -284,7 +284,7 @@
                             <td>Gerencia 2</td>
                             <td>2023-02-01</td>
                         </tr>
-                        <tr>
+                        <tr onclick="abrirModal(this)">
                             <td>003</td>
                             <td>Producto C</td>
                             <td>Marca X</td>
@@ -293,7 +293,7 @@
                             <td>Gerencia 1</td>
                             <td>2023-03-01</td>
                         </tr>
-                        <tr>
+                        <tr onclick="abrirModal(this)">
                             <td>004</td>
                             <td>Producto D</td>
                             <td>Marca Y</td>
@@ -305,7 +305,9 @@
                         <!-- Agrega más filas según sea necesario -->
                     </tbody>
                 </table>
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
+            
             <!-- Modal -->
             <div id="modal" class="modal">
                 <div class="modal-content">
@@ -355,7 +357,7 @@
                     margin: 15% auto; /* 15% desde la parte superior y centrado */
                     padding: 20px;
                     border: 1px solid #888;
-                    width: 80%; /* Ancho del modal */
+                    width: 40%; /* Ancho del modal */
                 }
                 .close {
                     color: #aaa;
@@ -373,17 +375,18 @@
 
             <script>
                 let ordenAscendente = true; // Variable para controlar el orden
-            
+                let selectedRow; // Variable para almacenar la fila seleccionada
+
                 function filtrarTabla() {
                     const input = document.getElementById('searchInput');
                     const filter = input.value.toLowerCase();
                     const table = document.getElementById('productosTable');
                     const rows = table.getElementsByTagName('tr');
-            
+
                     for (let i = 1; i < rows.length; i++) { // Comenzar desde 1 para omitir la cabecera
                         const cells = rows[i].getElementsByTagName('td');
                         let mostrarFila = false;
-            
+
                         // Verificar si el valor de búsqueda está en alguna de las celdas
                         for (let j = 0; j < cells.length; j++) {
                             if (cells[j].innerText.toLowerCase().includes(filter)) {
@@ -391,31 +394,33 @@
                                 break;
                             }
                         }
-            
+
                         // Mostrar u ocultar la fila según el resultado del filtrado
                         rows[i].style.display = mostrarFila ? '' : 'none';
                     }
                 }
+
                 function ordenarTabla(columnaIndex) {
                     const table = document.getElementById('productosTable');
                     const rows = Array.from(table.rows).slice(1); // Obtener todas las filas excepto la cabecera
                     const orden = ordenAscendente ? 1 : -1; // Determinar el orden
-            
+
                     rows.sort((a, b) => {
                         const celdaA = a.cells[columnaIndex].innerText.toLowerCase();
                         const celdaB = b.cells[columnaIndex].innerText.toLowerCase();
-            
+
                         if (celdaA < celdaB) return -1 * orden;
                         if (celdaA > celdaB) return 1 * orden;
                         return 0;
                     });
-            
+
                     // Reinsertar las filas ordenadas en la tabla
                     rows.forEach(row => table.appendChild(row));
-            
+
                     // Cambiar el estado del orden para la próxima vez
                     ordenAscendente = !ordenAscendente;
                 }
+
                 function abrirModal(fila) {
                     const modal = document.getElementById('modal');
                     const motivoInput = document.getElementById('motivoInput');
@@ -424,6 +429,9 @@
                     // Limpiar los campos del modal
                     motivoInput.value = '';
                     ubicacionSelect.selectedIndex = 0;
+
+                    // Almacenar la fila seleccionada
+                    selectedRow = fila;
 
                     // Mostrar el modal
                     modal.style.display = "block";
@@ -438,26 +446,365 @@
                     const motivo = document.getElementById('motivoInput').value;
                     const ubicacion = document.getElementById('ubicacionSelect').value;
 
-                    // Aquí puedes agregar la lógica para manejar el motivo y la ubicación
-                    console.log(`Motivo: ${motivo}, Ubicación: ${ubicacion}`);
+                    // Obtener los datos del producto seleccionado
+                    const codigo = selectedRow.cells[0].innerText;
+                    const producto = selectedRow.cells[1].innerText;
+                    const gerencia = selectedRow.cells[5].innerText;
+                    const fechaIngreso = selectedRow.cells[6].innerText;
+                    const fechaRetiro = new Date().toISOString().split('T')[0]; // Fecha actual
+
+                    // Agregar la nueva fila a la tabla de productos retirados
+                    const tableBody = document.getElementById('withdrawalTable').getElementsByTagName('tbody')[0];
+                    const newRow = tableBody.insertRow();
+                    newRow.insertCell(0).innerText = codigo;
+                    newRow.insertCell(1).innerText = producto;
+                    newRow.insertCell(2).innerText = motivo;
+                    newRow.insertCell(3).innerText = gerencia;
+                    newRow.insertCell(4).innerText = fechaIngreso;
+                    newRow.insertCell(5).innerText = fechaRetiro;
+                    newRow.insertCell(6).innerText = ''; // Dejar en blanco para el QR
 
                     // Cerrar el modal después de enviar
                     cerrarModal();
                 }
 
-                    // Cerrar el modal si se hace clic fuera de él
-                    window.onclick = function(event) {
-                        const modal = document.getElementById('modal');
-                        if (event.target == modal) {
-                            cerrarModal();
-                        }
+                // Cerrar el modal si se hace clic fuera de él
+                window.onclick = function(event) {
+                    const modal = document.getElementById('modal');
+                    if (event.target == modal) {
+                        cerrarModal();
                     }
-            </script> 
+                }
+            </script>
 
-<div id="formulario6" class="formulario"> 
-                <h2>Reporte</h2>
-         </div>
-     </div>
+            <div id="formulario6" class="formulario"> 
+                <h2>Reporte de Bienes Nacionales Retirados</h2>
+                <label for="searchInputWithdrawal">Buscar:</label>
+                <input type="text" id="searchInputWithdrawal" placeholder="Buscar por palabra clave..." onkeyup="filterWithdrawalTable()">
+
+                <h2>Lista de Productos Retirados</h2>
+                <table id="withdrawalTable">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarWithdrawalTable(0)">Código</th>
+                            <th onclick="ordenarWithdrawalTable(1)">Producto</th>
+                            <th onclick="ordenarWithdrawalTable(2)">Motivo de Retiro</th>
+                            <th onclick="ordenarWithdrawalTable(3)">Gerencia</th>
+                            <th onclick="ordenarWithdrawalTable(4)">Fecha de Ingreso</th>
+                            <th onclick="ordenarWithdrawalTable(5)">Fecha de Retiro</th>
+                            <th>QR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los datos se llenarán aquí -->
+                    </tbody>
+                </table>
+                <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+            </div>
+
+            <!-- Modal para mostrar detalles del producto -->
+            <div id="modalDetalles" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="cerrarModalDetalles()">&times;</span>
+                    <h2>Detalles del Producto</h2>
+                    
+                    <div class="field">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <label>Código:</label>
+                                <p id="detalleCodigo"></p>
+                            </div>
+                            <div>
+                                <label>Producto:</label>
+                                <p id="detalleProducto"></p>
+                            </div>
+                            <div>
+                                <label>Marca:</label>
+                                <p id="detalleMarca"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <label>Número de Serie:</label>
+                                <p id="detalleSerial"></p>
+                            </div>
+                            <div>
+                                <label>Color:</label>
+                                <p id="detalleColor"></p>
+                            </div>
+                            <div>
+                                <label>Gerencia:</label>
+                                <p id="detalleGerencia"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <label>Fecha de Registro:</label>
+                                <p id="detalleFechaRegistro"></p>
+                            </div>
+                            <div>
+                                <label>Fecha de Asignación:</label>
+                                <p id="detalleFechaAsignacion"></p>
+                            </div>
+                            <div>
+                                <label>Fecha de Retiro:</label>
+                                <p id="detalleFechaRetiro"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nueva fila para el motivo de retiro y ubicación final -->
+                    <div class="field">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <label>Motivo de Retiro:</label>
+                                <p id="detalleRazonRetiro"></p>
+                            </div>
+                            <div>
+                                <label>Ubicación Final:</label>
+                                <p id="detalleUbicacionFinal"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección para el código QR y la imagen referencial -->
+                    <div class="field" style="display: flex; justify-content: space-between;">
+                        <div class="qr-code" style="flex: 1; margin-right: 10px;">
+                            <label>Código QR:</label>
+                            <img src="" alt="Código QR" id="detalleCodigoQR" style="width: 100%;">
+                        </div>
+                        <div class="image-container" style="flex: 1;">
+                            <label>Imagen Referencial:</label>
+                            <img src="" alt="Imagen Referencial" id="detalleImagenReferencial" style="width: 100%;">
+                        </div>
+                    </div>
+                    <!-- Botón para generar el informe en PDF -->
+                    <div class="field">
+                        <button onclick="generarInformePDF()">Generar Informe PDF</button>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .modal {
+                    display: none; 
+                    position: fixed; 
+                    z-index: 1; 
+                    left: 0;
+                    top: 0;
+                    width: 100%; 
+                    height: 100%; 
+                    overflow: auto; 
+                    background-color: rgb(0,0,0); 
+                    background-color: rgba(0,0,0,0.4); 
+                }
+                
+                .modal-content {
+                    background-color: #fefefe;
+                    margin: 15% auto; 
+                    padding: 20px;
+                    border: 1px solid #888;
+                    width: 50%; 
+                }
+                
+                .close {
+                    color: #aaa;
+                    float: right;
+                    font-size: 28px;
+                    font-weight: bold;
+                }
+                
+                .close:hover,
+                .close:focus {
+                    color: black;
+                    text-decoration: none;
+                    cursor: pointer;
+                }
+                .field {
+                    margin-bottom: 15px;
+                }
+
+                .field label {
+                    font-weight: bold;
+                }
+
+                .field p {
+                    margin: 5px 0;
+                }
+            </style>
+            <script>
+            // Datos de ejemplo del Formulario 5
+                const form5Data = [
+                    {
+                        code: '001',
+                        product: 'Producto A',
+                        reason: 'Defectuoso',
+                        management: 'Gerencia 1',
+                        dateEntry: '2024-01-01',
+                        dateWithdrawal: '2024-12-20',
+                        qr: '' // Dejar en blanco para el QR
+                    },
+                    {
+                        code: '002',
+                        product: 'Producto B',
+                        reason: 'Caducado',
+                        management: 'Gerencia 2',
+                        dateEntry: '2024-02-01',
+                        dateWithdrawal: '2024-12-20',
+                        qr: '' // Dejar en blanco para el QR
+                    },
+                    {
+                        code: '003',
+                        product: 'Producto C',
+                        reason: 'Exceso de Stock',
+                        management: 'Gerencia 1',
+                        dateEntry: '2024-03-01',
+                        dateWithdrawal: '2024-12-20',
+                        qr: '' // Dejar en blanco para el QR
+                    }
+                ];
+
+                let ordenAscendenteWithdrawal = true; // Variable para controlar el orden en la tabla de retiro
+
+                function filterWithdrawalTable() {
+                    const input = document.getElementById('searchInputWithdrawal');
+                    const filter = input.value.toLowerCase();
+                    const table = document.getElementById('withdrawalTable');
+                    const rows = table.getElementsByTagName('tr');
+
+                    for (let i = 1; i < rows.length; i++) { // Comenzar desde 1 para omitir la cabecera
+                        const cells = rows[i].getElementsByTagName('td');
+                        let mostrarFila = false;
+
+                        // Verificar si el valor de búsqueda está en alguna de las celdas
+                        for (let j = 0; j < cells.length; j++) {
+                            if (cells[j].innerText.toLowerCase().includes(filter)) {
+                                mostrarFila = true;
+                                break;
+                            }
+                        }
+
+                        // Mostrar u ocultar la fila según el resultado del filtrado
+                        rows[i].style.display = mostrarFila ? '' : 'none';
+                    }
+                }
+
+                function ordenarWithdrawalTable(columnaIndex) {
+                    const table = document.getElementById('withdrawalTable');
+                    const rows = Array.from(table.rows).slice(1); // Obtener todas las filas excepto la cabecera
+                    const orden = ordenAscendenteWithdrawal ? 1 : -1; // Determinar el orden
+
+                    rows.sort((a, b) => {
+                        const celdaA = a.cells[columnaIndex].innerText.toLowerCase();
+                        const celdaB = b.cells[columnaIndex].innerText.toLowerCase();
+
+                        if (celdaA < celdaB) return -1 * orden;
+                        if (celdaA > celdaB) return 1 * orden;
+                        return 0;
+                    });
+
+                    // Reinsertar las filas ordenadas en la tabla
+                    rows.forEach(row => table.appendChild(row));
+
+                    // Cambiar el estado del orden para la próxima vez
+                    ordenAscendenteWithdrawal = !ordenAscendenteWithdrawal;
+                }
+
+                // Función para llenar la tabla con datos del Formulario 5
+                function populateTable(data) {
+                    const tableBody = document.getElementById('withdrawalTable').getElementsByTagName('tbody')[0];
+                    data.forEach(item => {
+                        const row = tableBody.insertRow();
+                        row.insertCell(0).innerText = item.code;
+                        row.insertCell(1).innerText = item.product;
+                        row.insertCell(2).innerText = item.reason;
+                        row.insertCell(3).innerText = item.management;
+                        row.insertCell(4).innerText = item.dateEntry;
+                        row.insertCell(5).innerText = item.dateWithdrawal;
+                        row.insertCell(6).innerText = ''; // Dejar en blanco para el QR
+
+                        // Agregar el evento onclick a la fila
+                        row.onclick = function() {
+                            abrirModalDetalles(this);
+                        };
+                    });
+                }
+
+                // Llamar a la función para llenar la tabla
+                populateTable(form5Data);
+
+                function abrirModalDetalles(fila) {
+                    // Obtener los datos de la fila seleccionada
+                    const codigo = fila.cells[0].innerText;
+                    const producto = fila.cells[1].innerText;
+                    const motivo = fila.cells[2].innerText; // Este campo no se usará, pero puedes dejarlo si lo necesitas
+                    const gerencia = fila.cells[3].innerText;
+                    const fechaIngreso = fila.cells[4].innerText;
+                    const fechaRetiro = fila.cells[5].innerText;
+                    const ubicacionFinal = fila.cells[6].innerText; // Este campo no está en la tabla, pero puedes dejarlo si lo necesitas
+
+                    // Asignar los valores a los campos del modal
+                    document.getElementById('detalleCodigo').innerText = codigo;
+                    document.getElementById('detalleProducto').innerText = producto;
+                    document.getElementById('detalleMarca').innerText = ''; // Dejar en blanco
+                    document.getElementById('detalleSerial').innerText = ''; // Dejar en blanco
+                    document.getElementById('detalleColor').innerText = ''; // Dejar en blanco
+                    document.getElementById('detalleGerencia').innerText = gerencia;
+                    document.getElementById('detalleFechaRegistro').innerText = fechaIngreso;
+                    document.getElementById('detalleFechaAsignacion').innerText = ''; // Dejar en blanco
+                    document.getElementById('detalleFechaRetiro').innerText = fechaRetiro;
+                    document.getElementById('detalleRazonRetiro').innerText = motivo;
+                    document.getElementById('detalleUbicacionFinal').innerText = ubicacionFinal;
+                    
+                    
+                    // Asignar las imágenes (puedes cambiar las rutas según sea necesario)
+                    document.getElementById('detalleCodigoQR').src = 'ruta/a/codigo-qr.png'; // Cambia la ruta
+                    document.getElementById('detalleImagenReferencial').src = 'ruta/a/imagen-referencial.jpg'; // Cambia la ruta
+
+                    // Mostrar el modal
+                    document.getElementById('modalDetalles').style.display = 'block';
+                }
+
+                // Función para cerrar el modal
+                function cerrarModalDetalles() {
+                    document.getElementById('modalDetalles').style.display = 'none';
+                }
+
+                // Agregar un evento para cerrar el modal al hacer clic fuera de él
+                window.onclick = function(event) {
+                    const modal = document.getElementById('modalDetalles');
+                    if (event.target === modal) {
+                        cerrarModalDetalles();
+                    }
+                }
+                
+                function generarInformePDF() {
+                    const element = document.getElementById('modalDetalles');
+                    const options = {
+                        margin: 1,
+                        filename: 'informe_producto.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    };
+
+                    html2pdf()
+                        .from(element)
+                        .set(options)
+                        .save();
+                }
+            </script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
+
+
      <script>
          function mostrarFormulario(formularioId) {
              // Ocultar todos los formularios
