@@ -206,3 +206,41 @@ def obtener_marcas():
     except Exception as e:
         print(f"Error al obtener marcas: {e}")
         return []
+
+def almacenar_registro(marca, producto, color, serial, fecha_registro, categoria, foto, cantidad):
+    conexion = conectar()
+    if not conexion:
+        return False
+
+    try:
+        cursor = conexion.cursor()
+        query = """
+        INSERT INTO Registro (Marca, Producto, Color, Serial, Fecha_Registro, Categoria, Foto, Cantidad)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (marca, producto, color, serial, fecha_registro, categoria, foto, cantidad))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return True
+    except Exception as e:
+        print(f"Error al almacenar el registro: {e}")
+        return False
+    
+def obtener_Bienes():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = """SELECT id_registro, marca, producto, color, serial, fecha_registro, categoria, 
+        foto, cantidad FROM registro"""  
+        cursor.execute(query)
+        bienes = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return bienes
+    except Exception as e:
+        print(f"Error al obtener marcas: {e}")
+        return []

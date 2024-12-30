@@ -335,7 +335,7 @@
                 <input type="number" id="cantidad" min="1" placeholder="Cantidad">
                 <label for="imagen">Imagen</label> 
                 <input type="file" id="imagen"> 
-                <br><button>Enviar</button> 
+                <br><button type="button" onclick="enviarFormulario()">Enviar</button>
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
             <div id="formulario2" class="formulario">
@@ -346,8 +346,10 @@
                 </select>
                 <label for="asignacion-fecha" >Fecha de Asignación</label>
                 <input type="date" id="asignacion-fecha" placeholder="Fecha de Asignación">
-                <br><label for="asignacion-codigo">Código de Asignación</label>
-                <input type="text" id="asignacion-codigo" placeholder="Código de Asignación">
+                <br><label for="asignacion-codigo">Bien a Asignar</label>
+                <select id="Bienes" class="combo-box">
+                    <option value="" disabled selected>Selecciona una opción...</option>
+                </select>
                 <div class="frame">
                     <img src="" id="imagenQR">
                 </div>
@@ -362,11 +364,11 @@
                 <table id="asignacionesTable">
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabla(0)">Id</th>
-                            <th onclick="ordenarTabla(1)">Codigo</th>
-                            <th onclick="ordenarTabla(2)">Fecha de Asignacion</th>
-                            <th onclick="ordenarTabla(3)">Gerencia</th>
-                            <th onclick="ordenarTabla(4)">QR Code</th>
+                            <th onclick="ordenarTabla(0,'asignacionesTable')">Id</th>
+                            <th onclick="ordenarTabla(1,'asignacionesTable')">Codigo</th>
+                            <th onclick="ordenarTabla(2,'asignacionesTable')">Fecha de Asignacion</th>
+                            <th onclick="ordenarTabla(3,'asignacionesTable')">Gerencia</th>
+                            <th onclick="ordenarTabla(4,'asignacionesTable')">QR Code</th>
                         </tr>
                     </thead>
                     <tbody> 
@@ -379,19 +381,19 @@
              <div id="formulario4" class="formulario"> 
                 <h2>Consulta de Bienes Disponibles</h2>
                 <label for="palabra">Palabra de búsqueda</label>
-                <input type="text" id="searchInput" onkeyup="filtrarTabla('DisponiblesTable', 'searchInput')" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+                <input type="text" id="searchInput0" onkeyup="filtrarTabla('DisponiblesTable', 'searchInput0')" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
                 <div class="table-container">
                 <table id="DisponiblesTable">
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabla(0)">Id</th>
-                            <th onclick="ordenarTabla(1)">Marca</th>
-                            <th onclick="ordenarTabla(2)">Producto</th>
-                            <th onclick="ordenarTabla(3)">Color</th>
-                            <th onclick="ordenarTabla(4)">Serial</th>
-                            <th onclick="ordenarTabla(5)">Fecha de Registro</th>
-                            <th onclick="ordenarTabla(6)">Categoria</th>
-                            <th onclick="ordenarTabla(7)">Cantidad</th>
+                            <th onclick="ordenarTabla(0,'DisponiblesTable')">Id</th>
+                            <th onclick="ordenarTabla(1,'DisponiblesTable')">Marca</th>
+                            <th onclick="ordenarTabla(2,'DisponiblesTable')">Producto</th>
+                            <th onclick="ordenarTabla(3,'DisponiblesTable')">Color</th>
+                            <th onclick="ordenarTabla(4,'DisponiblesTable')">Serial</th>
+                            <th onclick="ordenarTabla(5,'DisponiblesTable')">Fecha de Registro</th>
+                            <th onclick="ordenarTabla(6,'DisponiblesTable')">Categoria</th>
+                            <th onclick="ordenarTabla(7,'DisponiblesTable')">Cantidad</th>
                         </tr>
                     </thead>
                     <tbody> 
@@ -411,13 +413,13 @@
                 <table id="DesincorporacionTable">
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabla(0)">Id</th>
-                            <th onclick="ordenarTabla(1)">Codigo del Bien</th>
-                            <th onclick="ordenarTabla(2)">Gerencia</th>
-                            <th onclick="ordenarTabla(3)">Fecha asignacion</th>
-                            <th onclick="ordenarTabla(4)">Motivo de Retiro</th>
-                            <th onclick="ordenarTabla(5)">Fecha de Retiro</th>
-                            <th onclick="ordenarTabla(6)">Ubicacion Final</th>
+                            <th onclick="ordenarTabla(0,'DesincorporacionTable')">Id</th>
+                            <th onclick="ordenarTabla(1,'DesincorporacionTable')">Codigo del Bien</th>
+                            <th onclick="ordenarTabla(2,'DesincorporacionTable')">Gerencia</th>
+                            <th onclick="ordenarTabla(3,'DesincorporacionTable')">Fecha asignacion</th>
+                            <th onclick="ordenarTabla(4,'DesincorporacionTable')">Motivo de Retiro</th>
+                            <th onclick="ordenarTabla(5,'DesincorporacionTable')">Fecha de Retiro</th>
+                            <th onclick="ordenarTabla(6,'DesincorporacionTable')">Ubicacion Final</th>
                         </tr>
                     </thead>
                     <tbody> 
@@ -466,10 +468,10 @@
                     <table id="reporteTable">
                         <thead>
                             <tr>
-                                <th onclick="ordenarTabla(0)">Id</th>
-                                <th onclick="ordenarTabla(1)">Producto</th>
-                                <th onclick="ordenarTabla(2)">Gerencia</th>
-                                <th onclick="ordenarTabla(3)">Fecha de Asignacion</th>
+                                <th onclick="ordenarTabla(0,'reporteTable')">Id</th>
+                                <th onclick="ordenarTabla(1,'reporteTable')">Producto</th>
+                                <th onclick="ordenarTabla(2,'reporteTable')">Gerencia</th>
+                                <th onclick="ordenarTabla(3,'reporteTable')">Fecha de Asignacion</th>
                             </tr>
                         </thead>
                         <tbody> 
@@ -708,7 +710,55 @@
             
             actualizarReporte();
         });
-        
+
+        document.addEventListener("DOMContentLoaded", function() 
+        { fetch('/mi_aplicacion/get_bienes/') 
+        .then(response => response.json()) 
+        .then(data => { 
+            const comboBox = document.getElementById('Bienes'); 
+            comboBox.innerHTML = ''; 
+            data.forEach(bienes => { 
+                const newOption = document.createElement('option'); 
+                newOption.value = bienes[0]; 
+                newOption.textContent = marcas[2];
+                comboBox.appendChild(newOption); 
+            }); 
+        }) 
+        .catch(error => { 
+            console.error('Error al cargar las opciones:', error); 
+            document.getElementById('marcas').innerHTML = '<option value="">Error al cargar opciones</option>'; 
+        });
+     });
+        function enviarFormulario() { 
+            const formData = new FormData(); 
+            formData.append('marca', document.getElementById('marcas').value); 
+            formData.append('producto', document.getElementById('producto').value); 
+            formData.append('color', document.getElementById('color').value); 
+            formData.append('serial', document.getElementById('serial').value); 
+            formData.append('fecha_registro', document.getElementById('fecha_registro').value); 
+            formData.append('categoria', document.getElementById('categorias').value); 
+            formData.append('cantidad', document.getElementById('cantidad').value); 
+            formData.append('foto', document.getElementById('imagen').files[0]); 
+            formData.append('csrfmiddlewaretoken', getCookie('csrftoken')); 
+            
+            fetch('/mi_aplicacion/registrar_bienes/', { 
+                method: 'POST', 
+                body: formData, headers: { 
+                    'X-CSRFToken': getCookie('csrftoken'), 
+                }, 
+            }) 
+            .then(response => response.json()) 
+            .then(data => { 
+                if (data.success) { 
+                    alert(data.success); 
+                } else { 
+                    alert('Error al almacenar el registro.'); 
+                } 
+            }) 
+            .catch(error => { 
+                console.error('Error al almacenar el registro:', error); 
+            }); 
+        }
 
          document.addEventListener("DOMContentLoaded", function() { 
             fetch('/mi_aplicacion/consulta_disponibles/') 
@@ -825,8 +875,8 @@
             }
         }
 
-        function ordenarTabla(n) {
-            const table = document.getElementById("asignacionesTable");
+        function ordenarTabla(n, tableId) {
+            const table = document.getElementById(tableId);
             let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
             switching = true;
             dir = "asc";

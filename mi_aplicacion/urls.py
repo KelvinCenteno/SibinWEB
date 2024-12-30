@@ -12,4 +12,6 @@ urlpatterns = [
    path('consulta_desincorporacion/', consulta_desincorporacion_view, name='consulta_desincorporacion'),
    path('get_categorias/', get_categorias, name='get_categorias'),
    path('get_marcas/', get_marcas, name='get_marcas'),
+   path('registrar_bienes/', registrar_bienes, name='registar_bienes'),
+   path('get_bienes/', get_bienes, name='get_bienes')
 ]

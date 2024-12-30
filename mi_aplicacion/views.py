@@ -10,7 +10,7 @@ from django.conf import settings
 import os
 from .generar_informe import completar_plantilla
 import requests
-from datetime import datetime
+
 def index(request):
     return render(request, 'login.html')
 
@@ -138,7 +138,7 @@ def generar_informe_view(request):
                 with open(temp_qr_code_path, 'wb') as temp_file:
                     temp_file.write(qr_code_data)
 
-                ruta_plantilla = os.path.join('C:/Users/JORNADAS1/Documents', 'plantilla.docx')
+                ruta_plantilla = os.path.join(settings.BASE_DIR, 'templates_word', 'detalles_bienes.docx')
                 nombre_archivo = f'informe_{id}_{codigo}_{fecha_asignacion}_{gerencia_id}.pdf'
                 ruta_salida = os.path.join('C:/Users/JORNADAS1/Documents', nombre_archivo)
                 
@@ -196,3 +196,34 @@ def get_categorias(request):
 def get_marcas(request):
     marcas = obtener_marcas()
     return JsonResponse(marcas, safe=False)
+
+def registrar_bienes(request):
+    if request.method == 'POST':
+        marca = request.POST.get('marca')
+        producto = request.POST.get('producto')
+        color = request.POST.get('color')
+        serial = request.POST.get('serial')
+        fecha_registro = request.POST.get('fecha_registro')
+        categoria = request.POST.get('categoria')
+        cantidad = request.POST.get('cantidad')
+
+        foto = request.FILES.get('foto')
+        if not foto:
+            return JsonResponse({'error': 'Foto no proporcionada'}, status=400)
+
+        # Convertir la foto a binario
+        foto_binaria = foto.read()
+
+        # Guardar en la base de datos utilizando la función almacenar_registro
+        exito = almacenar_registro(marca, producto, color, serial, fecha_registro, categoria, foto_binaria, cantidad)
+        
+        if exito:
+            return JsonResponse({'success': 'Registro almacenado correctamente.'})
+        else:
+            return JsonResponse({'error': 'Error al almacenar el registro.'}, status=500)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def get_bienes(request):
+    bienes = obtener_Bienes()
+    return JsonResponse(bienes, safe=False)
