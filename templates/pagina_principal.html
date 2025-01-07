@@ -1,10 +1,14 @@
-{% csrf_token %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pagina_principal</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"> 
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>SIBIN Pagina Principal</title>
+    <link rel="icon" href="{% static 'logo2.ico' %}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -181,7 +185,7 @@
         }
         .combo-box { 
             padding: 10px; 
-            width: 200px; 
+            width: 250px; 
             border: 1px solid #ccc; 
             border-radius: 5px;
             margin: 10px 10px;
@@ -277,23 +281,32 @@
         } 
         @keyframes spin { 
             0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } }
+            100% { transform: rotate(360deg); } 
+        }
+        .close-btn { 
+            margin-left: 10px; 
+        }
        </style>
 </head>
 <body>
+    {% csrf_token %}
     <div class="container">
         <div class="sidebar">
-            <img src="/static/logo2.jpg" alt="Logo" class="logo">
+            <img src="{% static 'logo2.jpg' %}" alt="Logo" class="logo">
             <div class="welcome">
                 <marquee direction="">
                     ¡Bienvenido Usuario {{ usuario }}!
                 </marquee>
+                <a href="{% url 'logout' %}" class="close-btn"> 
+                    <img src="{% static 'cerrar_Seccion.png' %}" alt="Cerrar Sesión" width="20" height="20">
+                </a>
             </div>
             <div class="titulo">
                 <span>SISTEMA DE </span>
                 <span>INVENTARIO PARA </span>
                 <span>BIENES NACIONALES </span>
-                <span>(SIBIN)</span></div>
+                <span>(SIBIN)</span>
+            </div>
             <button class="button" onclick="mostrarFormulario('formulario1')" onmouseover="hideDropdown('dropdown1')">REGISTRO</button>
             <button class="button" onclick="mostrarFormulario('formulario2')" onmouseover="hideDropdown('dropdown1')">ASIGNACIÓN</button>
             <button class="button" onmouseover="showDropdown('dropdown1')">CONSULTA</button>
@@ -355,11 +368,12 @@
                 </div>
                 <br><button id="enviarAsignacion">Enviar</button> 
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+                <br><br>
             </div>
             <div id="formulario3" class="formulario"> 
                 <h2>Consulta de Bienes Asignados</h2>
                 <label for="palabra">Palabra de búsqueda</label>
-                <input type="text" id="searchInput" onkeyup="filtrarTabla('asignacionesTable', 'searchInput')" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+                <input type="text" id="searchInput" onkeyup="filtrarTabla('asignacionesTable', 'searchInput')" placeholder="Buscar por palabra clave...">
                 <div class="table-container">
                 <table id="asignacionesTable">
                     <thead>
@@ -376,6 +390,7 @@
                 </table>
                 </div>
                 <button id="actualizar">Actualizar</button>
+                <button onclick="exportarExcel()">Guardar Excel</button>
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
              <div id="formulario4" class="formulario"> 
@@ -394,13 +409,14 @@
                             <th onclick="ordenarTabla(5,'DisponiblesTable')">Fecha de Registro</th>
                             <th onclick="ordenarTabla(6,'DisponiblesTable')">Categoria</th>
                             <th onclick="ordenarTabla(7,'DisponiblesTable')">Cantidad</th>
+                            <th onclick="ordenarTabla(8,'DisponiblesTable')">Foto</th>
                         </tr>
                     </thead>
                     <tbody> 
                     </tbody>
                 </table>
                 </div>
-                <button id="generarReporte" onclick="generarInforme()">Generar Reporte</button>
+                <button id="actualizar2">Actualizar</button>
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
                  
              </div>
@@ -435,7 +451,8 @@
                 <button onclick="generarInforme()">Guardar como PDF</button>
                 <button onclick="closeReport()">Cerrar</button>
             </div>
-            <form id="formularioInforme" method="post" action="/mi_aplicacion/generar_informe/" style="display:none;"> 
+            <div id="loader" style="display: none;"></div>
+            <form id="formularioInforme" method="post" action="/mi_aplicacion/generar_informe2/" style="display:none;"> 
                 {% csrf_token %}
                 <input type="hidden" name="id" id="inputId"> 
                 <input type="hidden" name="codigo" id="inputCodigo"> 
@@ -478,12 +495,13 @@
                         </tbody>
                     </table>
                     </div>
-                    <button id="actualizar">Actualizar</button>
+                    <button id="actualizar3">Actualizar</button>
                     <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
         </div> 
      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     
     <script>
+        
          function mostrarFormulario(formularioId) {
              // Ocultar todos los formularios
              const formularios = document.getElementsByClassName('formulario');
@@ -568,52 +586,56 @@
             document.getElementById('marcas').innerHTML = '<option value="">Error al cargar opciones</option>'; 
         });
      });
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById('enviarAsignacion').addEventListener('click', function(event) {
-                event.preventDefault();  // Evitar que el formulario se envíe automáticamente
 
-                const codigo = document.getElementById('asignacion-codigo').value;
-                const fechaAsignacion = document.getElementById('asignacion-fecha').value;
-                const gerenciaSelect = document.getElementById('gerencias');
-                const gerenciaId = gerenciaSelect.value;
-                const gerenciaNombre = gerenciaSelect.options[gerenciaSelect.selectedIndex].dataset.name;
-                
-                const formData = new FormData();
-                formData.append('codigo', codigo);
-                formData.append('fecha_asignacion', fechaAsignacion);
-                formData.append('gerencia_id', gerenciaId);
-                formData.append('gerencia_nombre', gerenciaNombre);
-                formData.append('csrfmiddlewaretoken', getCookie('csrftoken')); // Añadir token CSRF
+     document.getElementById('enviarAsignacion').addEventListener('click', function(event) {
+        event.preventDefault();  // Evitar que el formulario se envíe automáticamente
 
-                fetch('/mi_aplicacion/generar_qr_y_guardar/', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                    },
-                })
-                .then(response => response.json()) 
-                .then(data => { 
-                    console.log(data.image);
-                    if (data.image) { 
-                        const img = document.getElementById('imagenQR'); 
-                        img.src = `data:image/png;base64,${data.image}`; 
-                        img.style.width = "100%";
-                        img.style.height = "auto";
-                    } else { 
-                        alert('Error al generar el QR.');
-                     } 
-                    }) 
-                    .catch(error => { 
-                        console.error('Error al generar el QR:', error);
-                     }); 
-                    });
-                    // Cerrar el modal
-                    var span = document.getElementsByClassName("close")[0]; 
-                    span.onclick = function() { 
-                        const modal = document.getElementById("qrModal");
-                        modal.style.display = "none";}
-                });
+        const bienSelect = document.getElementById('Bienes');
+        const bienId = bienSelect.value;
+        const producto = bienSelect.options[bienSelect.selectedIndex].text;
+        const fechaAsignacion = document.getElementById('asignacion-fecha').value;
+        const gerenciaSelect = document.getElementById('gerencias');
+        const gerenciaId = gerenciaSelect.value;
+        const gerenciaNombre = gerenciaSelect.options[gerenciaSelect.selectedIndex].text;
+
+        const formData = new FormData();
+        formData.append('codigo', bienId);
+        formData.append('producto', producto);  // Añadir el nombre del producto
+        formData.append('fecha_asignacion', fechaAsignacion);
+        formData.append('gerencia_id', gerenciaId);
+        formData.append('gerencia_nombre', gerenciaNombre);
+        formData.append('csrfmiddlewaretoken', getCookie('csrftoken')); // Añadir token CSRF
+
+        fetch('/mi_aplicacion/generar_qr_y_guardar/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json()) 
+        .then(data => { 
+            console.log(data.image);
+            if (data.image) { 
+                const img = document.getElementById('imagenQR'); 
+                img.src = `data:image/png;base64,${data.image}`; 
+                img.style.width = "100%";
+                img.style.height = "auto";
+            } else { 
+                alert('Error al generar el QR.');
+            } 
+        }) 
+        .catch(error => { 
+            console.error('Error al generar el QR:', error);
+            }); 
+        });
+
+        var span = document.getElementsByClassName("close")[0]; 
+        span.onclick = function() { 
+            const modal = document.getElementById("qrModal");
+            modal.style.display = "none";
+        }
+
         function getCookie(name) { 
             let cookieValue = null; 
             if (document.cookie && document.cookie !== '') { 
@@ -628,7 +650,10 @@
             } 
             return cookieValue; }
             let ordenAscendente = true; // Variable para controlar el orden
-            
+       
+       function exportarExcel() { 
+        window.location.href = "/mi_aplicacion/guardar_excel/"; 
+    }    
        function abrirModal(fila) {
                 const modal = document.getElementById('modal');
                 const motivoInput = document.getElementById('motivoInput');
@@ -658,6 +683,25 @@
                 cerrarModal();
             }
 
+        document.addEventListener("DOMContentLoaded", function() 
+        { fetch('/mi_aplicacion/obtener_disponibles/') 
+        .then(response => response.json()) 
+        .then(data => { 
+            const comboBox = document.getElementById('Bienes'); 
+            comboBox.innerHTML = ''; 
+            data.forEach(bienes => { 
+                const newOption = document.createElement('option'); 
+                newOption.value = bienes.id_Registro; 
+                newOption.textContent = bienes.Producto;
+                newOption.dataset.name = bienes.Producto;
+                comboBox.appendChild(newOption); 
+            }); 
+        }) 
+        .catch(error => { 
+            console.error('Error al cargar las opciones:', error); 
+            document.getElementById('bienes').innerHTML = '<option value="">Error al cargar opciones</option>'; 
+        });
+     });     
                 // Cerrar el modal si se hace clic fuera de él
         window.onclick = function(event) {
                     const modal = document.getElementById('modal');
@@ -706,29 +750,12 @@
                 })
                 .catch(error => console.error('Error al obtener las asignaciones:', error));
             }
-            document.getElementById('actualizar').addEventListener('click', actualizarReporte); 
+            document.getElementById('actualizar3').addEventListener('click', actualizarReporte); 
             
             actualizarReporte();
         });
 
-        document.addEventListener("DOMContentLoaded", function() 
-        { fetch('/mi_aplicacion/get_bienes/') 
-        .then(response => response.json()) 
-        .then(data => { 
-            const comboBox = document.getElementById('Bienes'); 
-            comboBox.innerHTML = ''; 
-            data.forEach(bienes => { 
-                const newOption = document.createElement('option'); 
-                newOption.value = bienes[0]; 
-                newOption.textContent = marcas[2];
-                comboBox.appendChild(newOption); 
-            }); 
-        }) 
-        .catch(error => { 
-            console.error('Error al cargar las opciones:', error); 
-            document.getElementById('marcas').innerHTML = '<option value="">Error al cargar opciones</option>'; 
-        });
-     });
+  
         function enviarFormulario() { 
             const formData = new FormData(); 
             formData.append('marca', document.getElementById('marcas').value); 
@@ -761,10 +788,12 @@
         }
 
          document.addEventListener("DOMContentLoaded", function() { 
+            function actualizarDisponibles() {
             fetch('/mi_aplicacion/consulta_disponibles/') 
             .then(response => response.json()) 
             .then(data => { 
                 const tabla = document.getElementById('DisponiblesTable').getElementsByTagName('tbody')[0]; 
+                tabla.innerHTML = '';  // Limpiar tabla
                 data.forEach(disponibles => { 
                     const fila = tabla.insertRow(); 
                     fila.insertCell(0).textContent = disponibles.id_Registro; 
@@ -775,10 +804,15 @@
                     fila.insertCell(5).innerHTML = disponibles.fecha_registro; 
                     fila.insertCell(6).innerHTML = disponibles.categoria; 
                     fila.insertCell(7).innerHTML = disponibles.cantidad; 
+                    fila.insertCell(8).innerHTML = `<img src="data:image/png;base64,${disponibles.foto}" class="qr-code" alt="Foto">`;
             });
             }) 
             .catch(error => console.error('Error al obtener los disponibles:', error));
-         });
+         }
+            document.getElementById('actualizar2').addEventListener('click', actualizarDisponibles); 
+            
+            actualizarDisponibles();
+        }); 
 
          document.addEventListener("DOMContentLoaded", function() { 
             fetch('/mi_aplicacion/consulta_desincorporacion/') 
@@ -837,13 +871,18 @@
         function closeReport() {
             document.getElementById('reportFrame').style.display = 'none';
         }
+        function mostrarLoader() { document.getElementById('loader').style.display = 'block'; } 
+        function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
+
         function generarInforme() { 
+            mostrarLoader();
             document.getElementById('inputId').value = selectedRowData.id; 
             document.getElementById('inputCodigo').value = selectedRowData.codigo; 
             document.getElementById('inputFechaAsignacion').value = selectedRowData.fecha_asignacion; 
             document.getElementById('inputGerenciaID').value = selectedRowData.gerencia_id; 
             document.getElementById('inputQRCode').value = selectedRowData.qr_code
             document.getElementById('formularioInforme').submit(); 
+            setTimeout(ocultarLoader, 15000);
         }
 
         function printReport() {
@@ -917,4 +956,4 @@
      </script>
  </body>
  </html>
-               
+                                                                                                     

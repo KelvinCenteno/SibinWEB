@@ -10,9 +10,16 @@ from django.conf import settings
 import os
 from .generar_informe import completar_plantilla
 import requests
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.models import User
 
 def index(request):
     return render(request, 'login.html')
+
 
 @csrf_exempt
 def login_view(request):
@@ -21,28 +28,50 @@ def login_view(request):
         usuario = datos.get('usuario').strip()
         contrasena = datos.get('contrasena').strip()
         if validar_usuario(usuario, contrasena):
-            request.session['usuario'] = usuario  # Guardar el usuario en la sesión
-            return JsonResponse({'status': 'success', 'message': 'Acceso concedido'})
+
+            user, created = User.objects.get_or_create(username=usuario, defaults={'password': contrasena}) 
+            if created: 
+                user.set_unusable_password() 
+                user.save() 
+            auth_login(request, user)
+            request.session['usuario'] = usuario 
+            return JsonResponse({'status': 'success', 'message': 'Acceso concedido'}) 
         else:
             return JsonResponse({'status': 'error', 'message': 'Usuario o contraseña incorrectos'})
     return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
+def logout_view(request): 
+    logout(request)
+    request.session.flush() 
+    return redirect('index')
+
+@never_cache
+@login_required(login_url='index')
 def pagina_principal(request):
-    usuario = request.session.get('usuario', 'Invitado')  # Obtener el usuario de la sesión
+    usuario = request.session.get('usuario')  # Obtener el usuario de la sesión
     return render(request, 'pagina_principal.html', {'usuario': usuario})
+
+@never_cache
+@login_required(login_url='index')
+def administrador(request):
+    usuario = request.session.get('usuario')  # Obtener el usuario de la sesión
+    return render(request, 'administrador.html', {'usuario': usuario})
 
 def get_gerencias(request):
     gerencias = obtener_gerencias()
     return JsonResponse(gerencias, safe=False)
 
+
 def generar_qr_y_guardar(request):
     if request.method == 'POST':
         codigo = request.POST.get('codigo')
+        producto = request.POST.get('producto')  # Obtener el nombre del producto
         fecha_asignacion = request.POST.get('fecha_asignacion')
         gerencia_id = request.POST.get('gerencia_id')
         gerencia_name = request.POST.get('gerencia_nombre')
+        print(producto)
 
-        datos= f"Código de Asignación: {codigo}\nFecha de Asignación: {fecha_asignacion}\nGerencia: {gerencia_name}"
+        datos = f"Producto: {producto}\nCódigo de Bien: {codigo}\nFecha de Asignación: {fecha_asignacion}\nGerencia: {gerencia_name}"
         
         qr = qrcode.QRCode(
             version=1,
@@ -64,15 +93,12 @@ def generar_qr_y_guardar(request):
         if not os.path.exists(qr_dir): 
             os.makedirs(qr_dir) 
             
-        # Generar un nombre de archivo único 
         filename = f"qr_{codigo}_{fecha_asignacion}.png" 
         file_path = os.path.join(qr_dir, filename) 
         
-        # Guardar la imagen QR en el archivo 
         with open(file_path, "wb") as f: 
             f.write(buffered.getvalue())
 
-        # Guardar en la base de datos utilizando la función almacenar_asignacion
         exito = almacenar_asignacion(codigo, fecha_asignacion, gerencia_id, buffered.getvalue())
         
         if exito:
@@ -82,7 +108,8 @@ def generar_qr_y_guardar(request):
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-def obtener_productos_view(request):
+
+"""def obtener_productos_view(request):
     productos = obtener_productos()
     productos_lista = [
         {
@@ -96,7 +123,7 @@ def obtener_productos_view(request):
         }
         for producto in productos
     ]
-    return JsonResponse(productos_lista, safe=False)
+    return JsonResponse(productos_lista, safe=False)"""
 
 
 def obtener_asignaciones_view(request):
@@ -155,6 +182,56 @@ def generar_informe_view(request):
         
     return HttpResponse("Método no permitido", status=405)
 
+def generar_informe_view2(request):
+    usuario = request.session.get('usuario') 
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        codigo = request.POST.get('codigo')
+        fecha_asignacion = request.POST.get('fecha_asignacion')
+        gerencia_id = request.POST.get('gerencia_id')
+        qr_code = request.POST.get('qr_code')
+
+        # Obtener datos de la base de datos según el código
+        registro = consulta_registro_por_codigo(codigo)
+        if not registro:
+            return HttpResponse("Registro no encontrado", status=404)
+
+        datos = {
+            "{{ID}}": id,
+            "{{Codigo}}": codigo,
+            "{{FechaAsignacion}}": fecha_asignacion,
+            "{{GerenciaID}}": gerencia_id,
+            "{{Marca}}": registro[0],
+            "{{Producto}}": registro[1],
+            "{{Color}}": registro[2],
+            "{{Modelo}}": registro[3],
+        }
+
+        if qr_code:
+            qr_code_parts = qr_code.split(',')
+            if len(qr_code_parts) > 1:
+                qr_code_base64 = qr_code_parts[1]
+                qr_code_data = base64.b64decode(qr_code_base64)
+                temp_qr_code_path = os.path.join('C:/Users/JORNADAS1/Documents', 'temp_qr_code.png')
+                with open(temp_qr_code_path, 'wb') as temp_file:
+                    temp_file.write(qr_code_data)
+
+                ruta_plantilla = os.path.join(settings.BASE_DIR, 'templates_word', 'detalles_bienes.docx')
+                nombre_archivo = f'informe_{id}_{codigo}_{fecha_asignacion}_{gerencia_id}.pdf'
+                ruta_salida = os.path.join('C:/Users/JORNADAS1/Documents', nombre_archivo)
+                
+                completar_plantilla(usuario, ruta_plantilla, ruta_salida, datos, temp_qr_code_path, registro[4])
+                
+                with open(ruta_salida, 'rb') as f:
+                    response = HttpResponse(f.read(), content_type='application/pdf')
+                    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+                    return response
+            else:
+                print("Error: El formato del QR Code no es el esperado.")
+        else:
+            print("Error: QR Code no recibido.")
+        
+    return HttpResponse("Método no permitido", status=405)
 
 def consulta_registros_view(request):
     disponibles = consulta_disponibles()
@@ -167,10 +244,26 @@ def consulta_registros_view(request):
             'serial': disponibles[4],
             'fecha_registro': disponibles[5],
             'categoria': disponibles[6],
+            'foto': disponibles [7],
             'cantidad': disponibles[8],
         }
         for disponibles in disponibles
     ]
+    return JsonResponse(disponibles_lista, safe=False)
+
+def consulta_bienes_disponibles(request):
+    disponibles = obtener_disponibles()
+    disponibles_lista = [
+        {
+            'id_Registro': disponibles[0],
+            'Producto': disponibles[1],
+            'Fecha': disponibles[2],
+            'categoria': disponibles[3],
+            'cantidad': disponibles[5],
+        }
+        for disponibles in disponibles
+    ]
+    print(disponibles_lista)
     return JsonResponse(disponibles_lista, safe=False)
 
 def consulta_desincorporacion_view(request):

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Inventario para Bienes Nacionales</title>
+    <link rel="icon" href="{% static 'logo2.ico' %}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,10 +15,127 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            position: relative;
+            overflow: hidden;
         }
+        .titulo {
+            font-size: 18px;
+            font-family: 'Franklin Gothic Medium';
+            color: firebrick;
+            margin-bottom: 20px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: absolute; 
+            top: 4%; 
+            left: 25%; 
+        }
+    
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5; /* Ajusta la transparencia del video */
+            z-index: -1;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* Ajusta la transparencia del color de fondo */
+            z-index: 0;
+        }
+        
         .login-container {
+            position: relative;
             width: 300px;
             height: 500px;
+            padding: 20px;
+            border-radius: 50px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(73, 16, 16, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/static/Imagen2.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.5; /* Ajusta la transparencia de la imagen de fondo */
+            z-index: -1;
+            filter: brightness(70%); /* Ajusta el brillo de la imagen de fondo */
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button {
+            padding: 10px;
+            background: firebrick;
+            color: white;
+            cursor: pointer;
+            margin: 20px 0;
+            border-radius: 5px;
+            width: 70%;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+        }
+        
+        button:hover {
+            background: rgb(139, 0, 30);
+            box-shadow: inset 2px 2px 8px rgba(0, 0, 0, 0.4), inset -2px -2px 8px rgba(255, 255, 255, 0.4);
+        }
+        
+        #mensaje {
+            margin-top: 10px;
+            color: red;
+        }
+        
+        .admin-link {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .modal-content {
+            width: 300px;
+            height: 400px;
             padding: 20px;
             background-image: url('/static/Imagen2.jpg');
             background-size: cover;
@@ -29,42 +148,52 @@
             align-items: center;
             justify-content: center;
         }
-        input[type="text"], input[type="password"] {
-            width: 80%;
-            padding: 10px;
-            margin: 20px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px;
-            background: firebrick;
+        
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             color: white;
+            font-size: 24px;
             cursor: pointer;
-            margin: 40px 0;
-            border-radius: 5px;
-            width: 70%;
-            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
-        }
-        button:hover {
-            background: rgb(139, 0, 30);
-            box-shadow: inset 2px 2px 8px rgba(0, 0, 0, 0.4), inset -2px -2px 8px rgba(255, 255, 255, 0.4);
-        }
-        #mensaje {
-            margin-top: 10px;
-            color: red;
         }
     </style>
 </head>
 <body>
+    <video class="video-background" autoplay muted loop>
+        <source src="{% static 'VideoLogo.mp4' %}" type="video/mp4">
+        <source src="{% static 'VideoLogo.webm' %}" type="video/webm">
+        <source src="{% static 'VideoLogo.ogv' %}" type="video/ogg">
+        Tu navegador no soporta la etiqueta de video.
+    </video>
+    <div class="overlay"></div>
     <div class="login-container">
-        <h2>Iniciar Sesión</h2>
-        <img src="/static/logo2.jpg" alt="Logo" style="width: 100px; height: 100px;">
+        <div class="titulo">
+            <span>SISTEMA DE </span>
+            <span>INFORMACION PARA </span>
+            <span>BIENES NACIONALES </span>
+        </div>
+        <h2></h2><br>
+        <img src="{% static 'logo2.jpg' %}" alt="Logo" style="width: 100px; height: 100px;">
         <input type="text" id="usuario" placeholder="Usuario">
         <input type="password" id="contrasena" placeholder="Contraseña">
         <button onclick="login()">Ingresar</button>
         <p id="mensaje"></p>
+        <label class="admin-link" onclick="abrirModal()">Acceder como administrador</label>
     </div>
+
+    <div id="modalAdmin" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2>Administrador</h2>
+            <img src="{% static 'logo2.jpg' %}" alt="Logo" style="width: 100px; height: 100px;">
+            <input type="text" id="adminUsuario" placeholder="Usuario">
+            <input type="password" id="adminContrasena" placeholder="Contraseña">
+            <button onclick="adminLogin()">Ingresar</button>
+            <p id="adminMensaje"></p>
+        </div>
+    </div>
+
     <script>
         function getCookie(name) {
             let cookieValue = null;
@@ -104,6 +233,42 @@
                     window.location.href = '/pagina_principal';
                 } else {
                     mensaje.style.color = 'red';
+                }
+            });
+        }
+
+        function abrirModal() {
+            document.getElementById('modalAdmin').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalAdmin').style.display = 'none';
+        }
+
+        function adminLogin() {
+            const csrftoken = getCookie('csrftoken');
+            const usuario = document.getElementById('adminUsuario').value;
+            const contrasena = document.getElementById('adminContrasena').value;
+
+            fetch('/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+
+                body: JSON.stringify({usuario: usuario, contrasena: contrasena})
+            })
+            .then(response => response.json())
+            .then(data => {
+                const adminMensaje = document.getElementById('adminMensaje');
+                adminMensaje.innerText = data.message;
+                if (data.status === 'success') {
+                    adminMensaje.style.color = 'green';
+                    adminMensaje.innerText = 'Acceso concedido';
+                    window.location.href = '/administrador';
+                } else {
+                    adminMensaje.style.color = 'red';
                 }
             });
         }

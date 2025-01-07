@@ -516,3 +516,194 @@ function cerrarFormulario() {
         formulario.style.display = 'none';
     }
 }
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Bienes Asignados</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            cursor: pointer;
+        }
+        th, td {
+            text-align: left;
+        }
+        .frame {
+            display: none; /* Ocultar el informe inicialmente */
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            position: absolute;
+            width: 70%;
+            height: 80%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .table-container {
+            overflow-y: auto;
+            max-height: 300px;  /* Ajusta esta altura según tus necesidades */
+        }
+        .table-container table {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="formulario3" class="formulario">
+        <h2>Consulta de Bienes Asignados</h2>
+        <label for="palabra">Palabra de búsqueda</label>
+        <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+        <div class="table-container">
+            <table id="asignacionesTable">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla(0)">Id</th>
+                        <th onclick="ordenarTabla(1)">Codigo</th>
+                        <th onclick="ordenarTabla(2)">Fecha de Asignacion</th>
+                        <th onclick="ordenarTabla(3)">Gerencia ID</th>
+                        <th onclick="ordenarTabla(4)">QR Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+    </div>
+
+    <div id="reportFrame" class="frame">
+        <h2>Informe</h2>
+        <p id="reportContent"></p>
+        <button onclick="closeReport()">Cerrar</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/obtener_asignaciones/')
+                .then(response => response.json())
+                .then(data => {
+                    const tabla = document.getElementById('asignacionesTable').getElementsByTagName('tbody')[0];
+                    if (tabla) {
+                        data.forEach(asignacion => {
+                            const fila = tabla.insertRow();
+                            fila.insertCell(0).textContent = asignacion.id;
+                            fila.insertCell(1).textContent = asignacion.codigo;
+                            fila.insertCell(2).textContent = asignacion.fecha_asignacion;
+                            fila.insertCell(3).textContent = asignacion.gerencia_id;
+                            fila.insertCell(4).innerHTML = `<img src="data:image/png;base64,${asignacion.qr_code}" alt="QR Code" style="width: 50px; height: auto;">`;  // Ajustar tamaño de imagen
+                        });
+                    } else {
+                        console.error('Error: No se encontró el elemento tbody en la tabla.');
+                    }
+                })
+                .catch(error => console.error('Error al obtener las asignaciones:', error));
+        });
+
+        function ordenarTabla(n) {
+            const table = document.getElementById("asignacionesTable");
+            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            switching = true;
+            dir = "asc";
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                    if (dir === "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount === 0 && dir === "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+
+        function filtrarTabla() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("asignacionesTable");
+            const trs = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < trs.length; i++) {
+                const tds = trs[i].getElementsByTagName("td");
+                let mostrarFila = false;
+
+                for (let j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        const txtValue = tds[j].textContent || tds[j].innerText;
+                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                            mostrarFila = true;
+                            break;
+                        }
+                    }
+                }
+                trs[i].style.display = mostrarFila ? "" : "none";
+            }
+        }
+
+        const table = document.getElementById('asignacionesTable');
+        table.addEventListener('click', function(event) {
+            const target = event.target;
+            if (target.tagName === 'TD') {
+                const row = target.parentNode;
+                generateReport(row);
+            }
+        });
+
+        function generateReport(row) {
+            const cells = row.getElementsByTagName('td');
+            const reportData = {
+                id: cells[0].textContent,
+                codigo: cells[1].textContent,
+                fecha_asignacion: cells[2].textContent,
+                gerencia_id: cells[3].textContent,
+                qr_code: cells[4].querySelector('img').src
+            };
+
+            document.getElementById('reportContent').innerHTML = `ID: ${reportData.id}<br>Codigo: ${reportData.codigo}<br>Fecha de Asignación: ${reportData.fecha_asignacion}<br>Gerencia ID: ${reportData.gerencia_id}<br>QR Code: <img src="${reportData.qr_code}" alt="QR Code" style="width: 50px; height: auto;">`;
+            document.getElementById('reportFrame').style.display = 'block';
+        }
+
+        function closeReport() {
+            document.getElementById('reportFrame').style.display = 'none';
+        }
+
+        function cerrarFormulario() {
+            document.getElementById('formulario3').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

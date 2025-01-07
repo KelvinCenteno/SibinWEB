@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documento Básico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            width: 98vw;
+            height: 98vh;
+            background-image: url('/static/Imagen2.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: flex;
+        }
+        .sidebar {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .header {
+            padding: 20px;
+            font-size: 20px;
+            color: firebrick;
+            align-items: center;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        .welcome {
+            font-size: 12px;
+            color: firebrick;
+            margin-bottom: 20px;
+            position: absolute; 
+            top: 20px; 
+            right: 20px;
+        }
+        .titulo {
+            font-size: 18px;
+            font-family: 'Franklin Gothic Medium';
+            color: firebrick;
+            margin-bottom: 20px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            position: absolute; 
+            top: 4%; 
+            left: 9.2%; 
+        }
+        .button {
+            padding: 20px 20px;
+            margin: 5px 0;
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            font-size: 120%;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            width: 100%;
+            height: 13%;
+        
+        }
+        .button:hover {
+            background:  rgba(151, 8, 8, 0.8);
+        }
+        .highlight {
+            color: rgb(110, 107, 107);
+        }
+        .close-btn { 
+            margin-left: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="{% static 'logo2.jpg' %}" alt="Logo" class="logo">
+            <div class="welcome">
+                <marquee direction="">
+                    ¡Bienvenido Usuario {{ usuario }}!
+                </marquee>
+                <a href="{% url 'logout' %}" class="close-btn"> 
+                    <img src="{% static 'cerrar_Seccion.png' %}" alt="Cerrar Sesión" width="20" height="20">
+                </a>
+            </div>
+            <div class="titulo">
+                <span>SISTEMA DE </span>
+                <span>INVENTARIO PARA </span>
+                <span>BIENES NACIONALES </span>
+                <span>(SIBIN)</span>
+            </div>
+            <button class="button">USUARIOS</button>
+            <button class="button">GERENCIAS</button>
+            <button class="button">MARCAS</button>
+            <button class="button">ALMACENES</button>
+            <button class="button">CATEGORIAS</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Mi Sitio Web</p>
+    </footer>
+</div>
+</body>
+</html>

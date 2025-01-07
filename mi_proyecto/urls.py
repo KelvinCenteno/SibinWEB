@@ -23,9 +23,11 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),  # Página principal
-    path('login/', views.login_view, name='login'),  # Ruta de login
-    path('pagina_principal/', views.pagina_principal, name='pagina_principal'),  # Ruta de la página principal
-    path('mi_aplicacion/', include('mi_aplicacion.urls'))
+    path('', views.index, name='index'), 
+    path('login/', views.login_view, name='login'), 
+    path('pagina_principal/', views.pagina_principal, name='pagina_principal'),  
+    path('mi_aplicacion/', include('mi_aplicacion.urls')),
+    path('logout/', views.logout_view, name='logout'),
+     path('administrador/', views.administrador, name='administrador')
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

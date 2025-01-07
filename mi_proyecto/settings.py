@@ -25,7 +25,13 @@ SECRET_KEY = 'django-insecure-<tu_secreto>'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*',
+                 'sibin-emvepro.com',
+                 'www.sibin-emvepro.com',
+                 ]
+#	127.0.0.1       sibin-emvepro.com
+#	127.0.0.1       www.sibin-emvepro.com
+
 
 # Application definition
 

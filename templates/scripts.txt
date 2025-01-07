@@ -62,3 +62,380 @@ document.addEventListener("DOMContentLoaded", function() {
         // Aquí puedes agregar el código adicional que necesites
     });
 });
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Interactivo</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th, td {
+            text-align: left;
+        }
+        th {
+            cursor: pointer;
+        }
+        .frame {
+            display: none; /* Ocultar el formulario inicialmente */
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            position: absolute;
+            width: 70%;
+            height: 80%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .table-container {
+            overflow-y: auto;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="formulario3" class="formulario"> 
+        <h2>Consulta de Bienes Asignados</h2>
+        <label for="palabra">Palabra de búsqueda</label>
+        <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+        <div class="table-container">
+            <table id="asignacionesTable">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla(0)">Id</th>
+                        <th onclick="ordenarTabla(1)">Codigo</th>
+                        <th onclick="ordenarTabla(2)">Fecha de Asignacion</th>
+                        <th onclick="ordenarTabla(3)">Gerencia ID</th>
+                        <th onclick="ordenarTabla(4)">QR Code</th>
+                    </tr>
+                </thead>
+                <tbody> 
+                </tbody>
+            </table>
+        </div>
+        <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+        <button id="generarReporte" onclick="printReport()">Generar Reporte</button>
+    </div>
+
+    <div id="reportFrame" class="frame">
+        <h2>Informe</h2>
+        <p id="reportContent"></p>
+        <button onclick="printReport()">Imprimir</button>
+        <button onclick="generatePDF()">Guardar como PDF</button>
+        <button onclick="closeReport()">Cerrar</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+        const table = document.getElementById('asignacionesTable');
+        let selectedRowData = null;
+
+        table.addEventListener('click', function(event) {
+            const target = event.target;
+            if (target.tagName === 'TD') {
+                const row = target.parentNode;
+                generateReport(row);
+            }
+        });
+
+        function generateReport(row) {
+            const cells = row.getElementsByTagName('td');
+            const reportData = {
+                id: cells[0].textContent,
+                codigo: cells[1].textContent,
+                fecha_asignacion: cells[2].textContent,
+                gerencia_id: cells[3].textContent,
+                qr_code: cells[4].textContent
+            };
+
+            selectedRowData = reportData;
+
+            document.getElementById('reportContent').textContent = `ID: ${reportData.id}\nCódigo: ${reportData.codigo}\nFecha de Asignación: ${reportData.fecha_asignacion}\nGerencia ID: ${reportData.gerencia_id}\nQR Code: ${reportData.qr_code}`;
+            document.getElementById('reportFrame').style.display = 'block';
+        }
+
+        function closeReport() {
+            document.getElementById('reportFrame').style.display = 'none';
+        }
+
+        function printReport() {
+            if (!selectedRowData) {
+                alert('Por favor, selecciona una fila de la tabla primero.');
+                return;
+            }
+
+            const reportContent = `ID: ${selectedRowData.id}\nCódigo: ${selectedRowData.codigo}\nFecha de Asignación: ${selectedRowData.fecha_asignacion}\nGerencia ID: ${selectedRowData.gerencia_id}\nQR Code: ${selectedRowData.qr_code}`;
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write('<html><head><title>Informe</title></head><body>');
+            printWindow.document.write('<pre>' + reportContent + '</pre>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function generatePDF() {
+            if (!selectedRowData) {
+                alert('Por favor, selecciona una fila de la tabla primero.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const reportContent = `ID: ${selectedRowData.id}\nCódigo: ${selectedRowData.codigo}\nFecha de Asignación: ${selectedRowData.fecha_asignacion}\nGerencia ID: ${selectedRowData.gerencia_id}\nQR Code: ${selectedRowData.qr_code}`;
+            doc.text(reportContent, 10, 10);
+            doc.save('informe.pdf');
+        }
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Bienes Asignados</title>
+    <style>
+        .table-container {
+            overflow-y: auto;
+            max-height: 300px; /* Ajusta esta altura según tus necesidades */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th, td {
+            text-align: left;
+        }
+        th {
+            cursor: pointer;
+        }
+        .formulario {
+            display: none; /* Ocultar el formulario inicialmente */
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            position: absolute;
+            width: 70%;
+            height: 80%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="formulario3" class="formulario">
+        <h2>Consulta de Bienes Asignados</h2>
+        <label for="palabra">Palabra de búsqueda</label>
+        <input type="text" id="searchInput" placeholder="Buscar por palabra clave..." onkeyup="filtrarTabla()">
+        <div class="table-container">
+            <table id="asignacionesTable">
+                <thead>
+                    <tr>
+                        <th onclick="ordenarTabla(0)">Id</th>
+                        <th onclick="ordenarTabla(1)">Codigo</th>
+                        <th onclick="ordenarTabla(2)">Fecha de Asignación</th>
+                        <th onclick="ordenarTabla(3)">Gerencia ID</th>
+                        <th onclick="ordenarTabla(4)">QR Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+    </div>
+
+    <div id="reportFrame" class="formulario">
+        <h2>Informe</h2>
+        <p id="reportContent"></p>
+        <button onclick="generatePDF()">Guardar como PDF</button>
+        <button onclick="printReport()">Imprimir</button>
+        <button onclick="closeReport()">Cerrar</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+        let selectedRowData = {};
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const table = document.getElementById('asignacionesTable');
+            table.addEventListener('click', function(event) {
+                const target = event.target;
+                if (target.tagName === 'TD') {
+                    const row = target.parentNode;
+                    generateReport(row);
+                }
+            });
+        });
+
+        function generateReport(row) {
+            const cells = row.getElementsByTagName('td');
+            selectedRowData = {
+                id: cells[0].textContent,
+                codigo: cells[1].textContent,
+                fecha_asignacion: cells[2].textContent,
+                gerencia_id: cells[3].textContent,
+                qr_code: cells[4].querySelector('img').src
+            };
+
+            document.getElementById('reportContent').innerHTML = `
+                <strong>ID:</strong> ${selectedRowData.id}<br>
+                <strong>Código:</strong> ${selectedRowData.codigo}<br>
+                <strong>Fecha de Asignación:</strong> ${selectedRowData.fecha_asignacion}<br>
+                <strong>Gerencia ID:</strong> ${selectedRowData.gerencia_id}<br>
+                <strong>QR Code:</strong><br>
+                <img src="${selectedRowData.qr_code}" style="width: 100px; height: auto;">
+            `;
+            document.getElementById('reportFrame').style.display = 'block';
+        }
+
+        function closeReport() {
+            document.getElementById('reportFrame').style.display = 'none';
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const reportContent = document.getElementById('reportContent').innerText;
+            doc.text(reportContent, 10, 10);
+            doc.save('informe.pdf');
+        }
+
+        function printReport() {
+            const reportContent = document.getElementById('reportContent').innerHTML;
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write('<html><head><title>Informe</title></head><body>');
+            printWindow.document.write(reportContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function filtrarTabla() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("asignacionesTable");
+            const tr = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < tr.length; i++) {
+                let td = tr[i].getElementsByTagName("td");
+                let showRow = false;
+                for (let j = 0; j < td.length; j++) {
+                    if (td[j] && td[j].innerText.toLowerCase().indexOf(filter) > -1) {
+                        showRow = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = showRow ? "" : "none";
+            }
+        }
+
+        function cerrarFormulario() {
+            document.getElementById("formulario3").style.display = "none";
+        }
+
+        function ordenarTabla(n) {
+            const table = document.getElementById("asignacionesTable");
+            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            switching = true;
+            dir = "asc";
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                    if (dir === "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount === 0 && dir === "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
+import base64
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import os
+from .generar_informe import completar_plantilla
+
+@csrf_exempt
+def generar_informe_view(request):
+    if request.method == 'POST':
+        id_ = request.POST.get('id')
+        codigo = request.POST.get('codigo')
+        fecha_asignacion = request.POST.get('fecha_asignacion')
+        gerencia_id = request.POST.get('gerencia_id')
+
+        datos = {
+            "{{ID}}": id_,
+            "{{Codigo}}": codigo,
+            "{{FechaAsignacion}}": fecha_asignacion,
+            "{{GerenciaID}}": gerencia_id
+        }
+        
+        # Obtener la cadena base64 de la imagen QR
+        qr_code_base64 = request.POST.get('qr_code').split(',')[1]  # Eliminar el prefijo 'data:image/png;base64,'
+        
+        # Decodificar la cadena base64 y guardarla como un archivo temporal
+        qr_code_data = base64.b64decode(qr_code_base64)
+        temp_qr_code_path = os.path.join(settings.BASE_DIR, 'temp_qr_code.png')
+        with open(temp_qr_code_path, 'wb') as temp_file:
+            temp_file.write(qr_code_data)
+
+        # Construir el nombre del archivo dinámicamente
+        nombre_archivo = f"{id_}_{codigo}_{fecha_asignacion}_{gerencia_id}.docx"
+        ruta_plantilla = os.path.join(settings.BASE_DIR, 'static', 'mi_aplicacion', 'plantilla.docx')
+        ruta_salida = os.path.join(settings.BASE_DIR, nombre_archivo)
+        
+        completar_plantilla(ruta_plantilla, ruta_salida, datos, temp_qr_code_path)
+        
+        with open(ruta_salida, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+            response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+            return response
+
+    return HttpResponse("Método no permitido", status=405)
