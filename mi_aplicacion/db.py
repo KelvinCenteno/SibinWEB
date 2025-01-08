@@ -383,3 +383,41 @@ def consulta_registro_por_codigo(codigo):
     except Exception as e:
         print(f"Error al obtener registro por código: {e}")
         return None
+
+def obtener_almacenes():
+    conexion = conectar()
+    if not conexion:
+        return []
+
+    try:
+        cursor = conexion.cursor()
+        query = """SELECT id, (estado || ', ' || municipio ||', '|| parroquia || ', ' || lugar) 
+        AS Ubicacion FROM Almacen;"""  
+        cursor.execute(query)
+        almacen = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return almacen
+    except Exception as e:
+        print(f"Error al obtener almacenes: {e}")
+        return []
+    
+def registrar_desincorporacion(bien_retirar, motivo_retiro, fecha_retiro, ubicacion_final):
+    conexion = conectar()
+    if not conexion:
+        return False
+
+    try:
+        cursor = conexion.cursor()
+        query = """
+        INSERT INTO desincorporacion (bien_retirar, motivo_retiro, fecha_retiro, "ubicación_final")
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (bien_retirar, motivo_retiro, fecha_retiro, ubicacion_final))
+        conexion.commit()
+        cursor.close()
+        conexion.close()
+        return True
+    except Exception as e:
+        print(f"Error al almacenar la desincorporación: {e}")
+        return False

@@ -113,7 +113,7 @@
         }
         .formulario {
             display: none; /* Ocultar el formulario inicialmente */
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             padding-top: 60px;
             padding-bottom: 40px;
@@ -127,6 +127,7 @@
             transform: translate(-50%, -50%);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+        
         .formulario input {
             width: 15%;
             padding: 10px;
@@ -151,7 +152,7 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
-        }
+        }  
         .formulario button:hover {
             background: darkred;
         }
@@ -420,11 +421,10 @@
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
                  
              </div>
-
              <div id="formulario5" class="formulario"> 
                 <h2>Reporte de Desincorporación</h2>
                 <label for="palabra">Palabra de búsqueda</label>
-                <input type="text" id="searchInput2" onkeyup="filtrarTabla('asignacionesTable', 'searchInput2')" placeholder="Buscar por palabra clave..." >
+                <input type="text" id="searchInput2" onkeyup="filtrarTabla('DesincorporacionTable', 'searchInput2')" placeholder="Buscar por palabra clave..." >
                 <div class="table-container">
                 <table id="DesincorporacionTable">
                     <thead>
@@ -442,15 +442,10 @@
                     </tbody>
                 </table>
                 </div>
-                <button id="generarReporte" onclick="generarInforme()">Generar Reporte</button>
+                <button id="actualizar4">Actualizar<button>
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
-            <div id="reportFrame" class="formulario">
-                <h2>Informe</h2>
-                <p id="reportContent"></p>
-                <button onclick="generarInforme()">Guardar como PDF</button>
-                <button onclick="closeReport()">Cerrar</button>
-            </div>
+            
             <div id="loader" style="display: none;"></div>
             <form id="formularioInforme" method="post" action="/mi_aplicacion/generar_informe2/" style="display:none;"> 
                 {% csrf_token %}
@@ -498,6 +493,28 @@
                     <button id="actualizar3">Actualizar</button>
                     <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
         </div> 
+        <div id="reportFrame" class="formulario">
+            <h2>Informe</h2>
+            <p id="reportContent"></p>
+            <button onclick="generarInforme()">Guardar como PDF</button>
+            <button onclick="closeReport()">Cerrar</button>
+        </div>
+        <div id="reporteFrame" class="formulario">
+            <h2>Informe</h2>
+            <p id="reporteDes"></p>
+            <br><strong>ID:</strong> <span id="idData"></span>
+            <br><strong>Código:</strong> <span id="codigoData"></span>
+            <br><strong>Gerencia:</strong> <span id="gerenciaData"></span>
+            <br><strong>Fecha de Asignación:</strong> <span id="fechaAsignacionData"></span>
+            <br><strong>Motivo de Desincorporación:</strong> 
+            <input id="motivoData" type="text" style="width: 200px; margin: 10px;"><br>
+            <strong>Ubicación Final:</strong>
+            <select id="almacen" class="combo-box">
+                <option value="" disabled selected></option>
+            </select><br><br>
+            <button onclick="enviarDesincorporar()">Desincorporar</button>
+            <button onclick="closeReport()">Cerrar</button>
+        </div>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     
     <script>
@@ -787,6 +804,38 @@
             }); 
         }
 
+        function enviarDesincorporar(){ 
+            const almacenSelect = document.getElementById('almacen');
+            const almacenId = almacenSelect.value;
+            const almacenNombre = almacenSelect.options[almacenSelect.selectedIndex].text;
+            const formData = new FormData(); 
+            formData.append('id', document.getElementById('idData').textContent); 
+            formData.append('codigo', document.getElementById('codigoData').textContent); 
+            formData.append('gerencia', document.getElementById('gerenciaData').textContent); 
+            formData.append('fecha_asignacion', document.getElementById('fechaAsignacionData').textContent); 
+            formData.append('motivo', document.getElementById('motivoData').value); 
+            formData.append('ubicacion_final', almacenId); 
+           
+            
+            fetch('/mi_aplicacion/capturar_des/', { 
+                method: 'POST', 
+                body: formData, headers: { 
+                    'X-CSRFToken': getCookie('csrftoken'), 
+                }, 
+            }) 
+            .then(response => response.json()) 
+            .then(data => { 
+                if (data.success) { 
+                    alert(data.success); 
+                } else { 
+                    alert('Error al almacenar el desincorporacion.'); 
+                } 
+            }) 
+            .catch(error => { 
+                console.error('Error al almacenar la desincorporacion:', error); 
+            }); 
+        }
+
          document.addEventListener("DOMContentLoaded", function() { 
             function actualizarDisponibles() {
             fetch('/mi_aplicacion/consulta_disponibles/') 
@@ -815,10 +864,12 @@
         }); 
 
          document.addEventListener("DOMContentLoaded", function() { 
+        function actualizarDesincorporacion() {
             fetch('/mi_aplicacion/consulta_desincorporacion/') 
             .then(response => response.json()) 
             .then(data => { 
                 const tabla = document.getElementById('DesincorporacionTable').getElementsByTagName('tbody')[0]; 
+                tabla.innerHTML = ''; 
                 data.forEach(desincorporados => { 
                     const fila = tabla.insertRow(); 
                     fila.insertCell(0).textContent = desincorporados.id; 
@@ -831,18 +882,26 @@
             });
             }) 
             .catch(error => console.error('Error al obtener las desincorporaciones:', error));
+            }
+            document.getElementById('actualizar4').addEventListener('click', actualizarDesincorporacion); 
+            
+            actualizarDesincorporacion();
          });
-         let selectedRowData = {};
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const table = document.getElementById('asignacionesTable');
-            table.addEventListener('click', function(event) {
-                const target = event.target;
-                if (target.tagName === 'TD') {
-                    const row = target.parentNode;
-                    generateReport(row);
-                }
-            });
+         let selectedRowData = {};
+         let selectedRowData2 = {};
+
+            document.addEventListener("DOMContentLoaded", function() {
+            const asignacionesTable = document.getElementById('asignacionesTable');
+            if (asignacionesTable) {
+                asignacionesTable.addEventListener('click', function(event) {
+                    const target = event.target;
+                    if (target.tagName === 'TD') {
+                        const row = target.parentNode;
+                        generateReport(row);
+                    }
+                });
+            }
         });
 
         function generateReport(row) {
@@ -871,6 +930,65 @@
         function closeReport() {
             document.getElementById('reportFrame').style.display = 'none';
         }
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const asignacionesTable = document.getElementById('reporteTable');
+            if (asignacionesTable) {
+                asignacionesTable.addEventListener('click', function(event) {
+                    const target = event.target;
+                    if (target.tagName === 'TD') {
+                        const row = target.parentNode;
+                        generateReporte(row);
+                    }
+                });
+            }
+        });
+
+        function generateReporte(row) {
+            const cells = row.getElementsByTagName('td');
+            selectedRowData2 = {
+                id: cells[0].textContent,
+                codigo: cells[1].textContent,
+                gerencia_id: cells[2].textContent,
+                fecha_asignacion: cells[3].textContent,
+            };
+            document.getElementById('idData').textContent = selectedRowData2.id; 
+            document.getElementById('codigoData').textContent = selectedRowData2.codigo; 
+            document.getElementById('gerenciaData').textContent = selectedRowData2.gerencia_id; 
+            document.getElementById('fechaAsignacionData').textContent = selectedRowData2.fecha_asignacion;
+
+            document.getElementById('reporteDes').innerHTML = `
+                <img src="/static/cintillo2.png" style="width: 100%; height: auto; border: 5px;"><br><br>
+                <br><label style="text-aling: left; font-size: 20; ">DETALLES DEL BIEN NACIONAL</label><br>
+                
+            `;
+            document.getElementById('reporteFrame').style.display = 'block';
+        }
+
+        function closeReport() {
+            document.getElementById('reporteFrame').style.display = 'none';
+        }
+
+            document.addEventListener("DOMContentLoaded", function() 
+            { fetch('/mi_aplicacion/get_almacenes/') 
+            .then(response => response.json()) 
+            .then(data => { 
+                const comboBox = document.getElementById('almacen'); 
+                comboBox.innerHTML = ''; 
+                data.forEach(almacen => { 
+                    const newOption = document.createElement('option'); 
+                    newOption.value = almacen[0]; 
+                    newOption.textContent = almacen[1];
+                    comboBox.appendChild(newOption); 
+                }); 
+            }) 
+            .catch(error => { 
+                console.error('Error al cargar las opciones:', error); 
+                document.getElementById('almacen').innerHTML = '<option value="">Error al cargar opciones</option>'; 
+            });
+        });
+
         function mostrarLoader() { document.getElementById('loader').style.display = 'block'; } 
         function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
 

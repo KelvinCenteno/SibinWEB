@@ -17,5 +17,7 @@ urlpatterns = [
    path('registrar_bienes/', registrar_bienes, name='registar_bienes'),
    path('get_bienes/', get_bienes, name='get_bienes'),
    path('guardar_excel/', guardar_Bienes_Asignados, name='guardar_excel'),
-   path('obtener_disponibles/', consulta_bienes_disponibles, name='obtener_disponibles')
+   path('obtener_disponibles/', consulta_bienes_disponibles, name='obtener_disponibles'),
+   path('get_almacenes/', get_almacenes , name='get_almacenes'),
+   path('capturar_des/', captura_Desincorporacion , name='capturar_des')
 ]

@@ -16,6 +16,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.models import User
+from datetime import datetime
 
 def index(request):
     return render(request, 'login.html')
@@ -263,7 +264,6 @@ def consulta_bienes_disponibles(request):
         }
         for disponibles in disponibles
     ]
-    print(disponibles_lista)
     return JsonResponse(disponibles_lista, safe=False)
 
 def consulta_desincorporacion_view(request):
@@ -320,3 +320,25 @@ def registrar_bienes(request):
 def get_bienes(request):
     bienes = obtener_Bienes()
     return JsonResponse(bienes, safe=False)
+
+def get_almacenes(request):
+    almacenes = obtener_almacenes()
+    return JsonResponse(almacenes, safe=False)
+
+def captura_Desincorporacion(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        codigo = request.POST.get('codigo')
+        gerencia = request.POST.get('gerencia')
+        fecha = request.POST.get('fecha_asignacion')
+        motivo = request.POST.get('motivo')
+        ubicacion = request.POST.get('ubicacion_final')
+        fecha_actual = datetime.now().strftime("%Y-%m-%d")
+
+        exito = registrar_desincorporacion(id, motivo, fecha_actual, ubicacion)
+        if exito:
+            return JsonResponse({'success': 'Registro almacenado correctamente.'})
+        else:
+            return JsonResponse({'error': 'Error al almacenar el registro.'}, status=500)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
