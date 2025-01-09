@@ -361,9 +361,11 @@
                 <label for="asignacion-fecha" >Fecha de Asignación</label>
                 <input type="date" id="asignacion-fecha" placeholder="Fecha de Asignación">
                 <br><label for="asignacion-codigo">Bien a Asignar</label>
+                <input type="text" id="filtro" placeholder="Filtrar opciones..." onkeyup="filtrarOpciones()">
                 <select id="Bienes" class="combo-box">
                     <option value="" disabled selected>Selecciona una opción...</option>
                 </select>
+                <label style="color: white;">______________________________________</label>
                 <div class="frame">
                     <img src="" id="imagenQR">
                 </div>
@@ -442,11 +444,10 @@
                     </tbody>
                 </table>
                 </div>
-                <button id="actualizar4">Actualizar<button>
+                <button id="actualizar4">Actualizar</button>
                 <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
             </div>
             
-            <div id="loader" style="display: none;"></div>
             <form id="formularioInforme" method="post" action="/mi_aplicacion/generar_informe2/" style="display:none;"> 
                 {% csrf_token %}
                 <input type="hidden" name="id" id="inputId"> 
@@ -513,12 +514,28 @@
                 <option value="" disabled selected></option>
             </select><br><br>
             <button onclick="enviarDesincorporar()">Desincorporar</button>
-            <button onclick="closeReport()">Cerrar</button>
+            <button onclick="closeReporte()">Cerrar</button>
         </div>
+        <div id="loader" style="display: none;"></div>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     
     <script>
+        function mostrarLoader() { document.getElementById('loader').style.display = 'block'; } 
+        function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
         
+        function filtrarOpciones() { 
+            const filtro = document.getElementById('filtro').value.toLowerCase(); 
+            const combobox = document.getElementById('combobox'); 
+            const opciones = combobox.getElementsByTagName('option'); 
+            for (let i = 0; i < opciones.length; i++) { 
+                const texto = opciones[i].textContent.toLowerCase(); 
+                if (texto.includes(filtro)) { 
+                    opciones[i].style.display = ''; 
+                } else { 
+                    opciones[i].style.display = 'none'; 
+                } 
+            } 
+        }
          function mostrarFormulario(formularioId) {
              // Ocultar todos los formularios
              const formularios = document.getElementsByClassName('formulario');
@@ -933,9 +950,9 @@
 
 
         document.addEventListener("DOMContentLoaded", function() {
-            const asignacionesTable = document.getElementById('reporteTable');
-            if (asignacionesTable) {
-                asignacionesTable.addEventListener('click', function(event) {
+            const reporteTable= document.getElementById('reporteTable');
+            if (reporteTable) {
+                reporteTable.addEventListener('click', function(event) {
                     const target = event.target;
                     if (target.tagName === 'TD') {
                         const row = target.parentNode;
@@ -966,7 +983,7 @@
             document.getElementById('reporteFrame').style.display = 'block';
         }
 
-        function closeReport() {
+        function closeReporte() {
             document.getElementById('reporteFrame').style.display = 'none';
         }
 
@@ -988,9 +1005,6 @@
                 document.getElementById('almacen').innerHTML = '<option value="">Error al cargar opciones</option>'; 
             });
         });
-
-        function mostrarLoader() { document.getElementById('loader').style.display = 'block'; } 
-        function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
 
         function generarInforme() { 
             mostrarLoader();
