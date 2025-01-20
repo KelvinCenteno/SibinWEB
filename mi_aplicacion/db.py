@@ -421,3 +421,46 @@ def registrar_desincorporacion(bien_retirar, motivo_retiro, fecha_retiro, ubicac
     except Exception as e:
         print(f"Error al almacenar la desincorporación: {e}")
         return False
+
+def consulta_bien_por_codigo(codigo):
+    conexion = conectar()
+    if not conexion:
+        print("Error: No se pudo establecer la conexión a la base de datos.")
+        return None
+
+    try:
+        cursor = conexion.cursor()
+        query = """SELECT codigo, qr_code from asignaciones
+                   WHERE id_asignacion = %s;"""
+        cursor.execute(query, (codigo,))
+        bien = cursor.fetchone()
+        cursor.close()
+        conexion.close()
+
+        if bien:
+            bienes_convertido = list(bien)
+            if bienes_convertido[1]:  # Si hay foto
+                bienes_convertido[1] = base64.b64encode(bienes_convertido[1]).decode('utf-8')
+            return bienes_convertido
+        else:
+            print(f"No se encontraron bienes con el código: {codigo}")
+            return None
+    except Exception as e:
+        print(f"Error al obtener bienes por código: {e}")
+        return None
+
+def cambiar_contrasena_bd(usuario, nueva_contrasena): 
+    conexion = conectar() 
+    if not conexion: 
+        return False 
+    try: 
+        cursor = conexion.cursor() 
+        query = """ UPDATE usuarios SET contrasena = %s WHERE usuario = %s """ 
+        cursor.execute(query, (nueva_contrasena, usuario)) 
+        conexion.commit() 
+        cursor.close() 
+        conexion.close() 
+        return True 
+    except Exception as e: 
+        print(f"Error al cambiar la contraseña: {e}") 
+    return False

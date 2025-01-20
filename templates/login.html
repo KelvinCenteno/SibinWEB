@@ -177,12 +177,13 @@
         <input type="password" id="contrasena" placeholder="Contraseña">
         <button onclick="login()">Ingresar</button>
         <p id="mensaje"></p>
-        <label class="admin-link" onclick="abrirModal()">Acceder como administrador</label>
+        <label class="admin-link" onclick="abrirModal('modalContra')">¿Olvido su contraseña?</label>
+        <label class="admin-link" onclick="abrirModal('modalAdmin')">Acceder como administrador</label>
     </div>
 
     <div id="modalAdmin" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
+            <span class="close" onclick="cerrarModal('modalAdmin')">&times;</span>
             <h2>Administrador</h2>
             <img src="{% static 'logo2.jpg' %}" alt="Logo" style="width: 100px; height: 100px;">
             <input type="text" id="adminUsuario" placeholder="Usuario">
@@ -192,6 +193,18 @@
         </div>
     </div>
 
+    <div id="modalContra" class="modal">
+        <div class="modal-content" style="height: 80%;">
+        <span class="close" onclick="cerrarModal('modalContra')">&times;</span>
+        <h2>Recuperación de contraseña</h2>
+        <img src="{% static 'logo2.jpg' %}" alt="Logo" style="width: 100px; height: 100px;">
+        <input type="text" id="Usuario" placeholder="Nombre de usuario">
+        <input type="password" id="NvaContra" placeholder="Nueva Contraseña">
+        <input type="password" id="ConfiContra" placeholder="Confirmar Contraseña">
+        <button onclick="cambiarContrasena()">Guardar cambios</button>
+    </div>
+    
+    </div>
     <script>
         function getCookie(name) {
             let cookieValue = null;
@@ -235,12 +248,12 @@
             });
         }
 
-        function abrirModal() {
-            document.getElementById('modalAdmin').style.display = 'flex';
+        function abrirModal(modalID) {
+            document.getElementById(modalID).style.display = 'flex';
         }
 
-        function cerrarModal() {
-            document.getElementById('modalAdmin').style.display = 'none';
+        function cerrarModal(modalID) {
+            document.getElementById(modalID).style.display = 'none';
         }
 
         function adminLogin() {
@@ -270,6 +283,54 @@
                 }
             });
         }
+
+        function cambiarContrasena() {
+            const usuario = document.getElementById('Usuario').value;
+            const nuevaContra = document.getElementById('NvaContra').value;
+            const confiContra = document.getElementById('ConfiContra').value;
+
+            // Validar que todos los campos estén llenos
+            if (!usuario || !nuevaContra || !confiContra) {
+                alert("Por favor, complete todos los campos.");
+                return;
+            }
+
+            // Validar que las contraseñas coincidan
+            if (nuevaContra !== confiContra) {
+                alert("Las contraseñas no coinciden.");
+                return;
+            }
+
+            // Preparar datos para enviar al servidor
+            const datos = {
+                usuario: usuario,
+                nueva_contrasena: nuevaContra
+            };
+
+            // Enviar solicitud POST al servidor para cambiar la contraseña
+            fetch('/mi_aplicacion/cambiar_contrasena/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')  // Incluye CSRF token
+                },
+                body: JSON.stringify(datos)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Contraseña cambiada exitosamente.");
+                    cerrarModal('modalContra');
+                } else {
+                    alert("Error al cambiar la contraseña: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error al cambiar la contraseña.");
+            });
+        }
+
     </script>
 </body>
 </html>

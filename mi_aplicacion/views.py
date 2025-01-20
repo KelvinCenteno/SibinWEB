@@ -342,3 +342,87 @@ def captura_Desincorporacion(request):
             return JsonResponse({'error': 'Error al almacenar el registro.'}, status=500)
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def generar_informe_des(request):
+    if request.method != 'POST':
+        return HttpResponse("Método no permitido", status=405)
+    
+    usuario = request.session.get('usuario') 
+    id = request.POST.get('id')
+    codigo = request.POST.get('codigo')
+
+    if not codigo:
+        return HttpResponse("Código no puede estar vacío", status=400)
+    
+    gerencia_id = request.POST.get('gerencia_id')
+    fecha_asignacion = request.POST.get('fecha_Asignacion')
+    motivo = request.POST.get('motivo')
+    fecha_retiro = request.POST.get('fecha_retiro')
+    ubicacion = request.POST.get('ubicacion')
+
+    bien = consulta_bien_por_codigo(codigo)
+
+    if bien is None:
+        return HttpResponse("Bien no encontrado", status=404)
+    
+    qr_code = bien[1]
+    registro = consulta_registro_por_codigo(bien[0])
+    
+    if not registro:
+        return HttpResponse("Registro no encontrado", status=404)
+
+    datos = {
+        "{{ID}}": id,
+        "{{Codigo}}": codigo,
+        "{{FechaAsignacion}}": fecha_asignacion,
+        "{{GerenciaID}}": gerencia_id,
+        "{{FechaRetiro}}": fecha_retiro, 
+        "{{Motivo}}": motivo,
+        "{{Ubicacion}}": ubicacion,
+        "{{Marca}}": registro[0],
+        "{{Producto}}": registro[1],
+        "{{Color}}": registro[2],
+        "{{Modelo}}": registro[3],
+    }
+
+    if qr_code:
+        try:
+            qr_code_data = base64.b64decode(qr_code)
+            temp_qr_code_path = os.path.join('C:/Users/JORNADAS1/Documents', 'temp_qr_code.png')
+            with open(temp_qr_code_path, 'wb') as temp_file:
+                temp_file.write(qr_code_data)
+
+            ruta_plantilla = os.path.join(settings.BASE_DIR, 'templates_word', 'detalles_retiro.docx')
+            nombre_archivo = f'informe_{id}_{codigo}_{fecha_asignacion}_{gerencia_id}.pdf'
+            ruta_salida = os.path.join('C:/Users/JORNADAS1/Documents', nombre_archivo)
+            
+            completar_plantilla(usuario, ruta_plantilla, ruta_salida, datos, temp_qr_code_path, registro[4])
+            
+            with open(ruta_salida, 'rb') as f:
+                response = HttpResponse(f.read(), content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+                return response
+        except (base64.binascii.Error, ValueError) as e:
+            print(f"Error al decodificar el QR Code: {e}")
+            return HttpResponse("Formato de QR Code no válido", status=400)
+    else:
+        print("Error: QR Code no recibido.")
+        return HttpResponse("QR Code no recibido", status=400)
+
+def cambiar_contrasena(request): 
+    if request.method == 'POST': 
+        datos = json.loads(request.body) 
+        usuario = datos.get('usuario') 
+        nueva_contrasena = datos.get('nueva_contrasena') 
+    
+        if not usuario or not nueva_contrasena: 
+            return JsonResponse({'success': False, 'message': 'Faltan datos.'}) 
+        
+        resultado = cambiar_contrasena_bd(usuario, nueva_contrasena) # Usamos la función creada anteriormente 
+        
+        if resultado: 
+            return JsonResponse({'success': True, 'message': 'Cambio exitoso'}) 
+        else: 
+            return JsonResponse({'success': False, 'message': 'Error al cambiar la contraseña.'}) 
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'})

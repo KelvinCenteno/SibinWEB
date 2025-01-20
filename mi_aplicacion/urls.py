@@ -10,6 +10,7 @@ urlpatterns = [
    path('obtener_asignaciones/', obtener_asignaciones_view, name='obtener_asignaciones'),
    path('generar_informe/', generar_informe_view, name='generar_informe'),
    path('generar_informe2/', generar_informe_view2, name='generar_informe2'),
+   path('generar_informe_Des/', generar_informe_des, name='generar_informe_Des'),
    path('consulta_disponibles/', consulta_registros_view, name='consulta_disponibles'),
    path('consulta_desincorporacion/', consulta_desincorporacion_view, name='consulta_desincorporacion'),
    path('get_categorias/', get_categorias, name='get_categorias'),
@@ -19,5 +20,6 @@ urlpatterns = [
    path('guardar_excel/', guardar_Bienes_Asignados, name='guardar_excel'),
    path('obtener_disponibles/', consulta_bienes_disponibles, name='obtener_disponibles'),
    path('get_almacenes/', get_almacenes , name='get_almacenes'),
-   path('capturar_des/', captura_Desincorporacion , name='capturar_des')
+   path('capturar_des/', captura_Desincorporacion , name='capturar_des'),
+   path('cambiar_contrasena/', cambiar_contrasena, name='cambiar_contrasena')
 ]

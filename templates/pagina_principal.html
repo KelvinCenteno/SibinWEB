@@ -381,8 +381,8 @@
                 <table id="asignacionesTable">
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabla(0,'asignacionesTable')">Id</th>
-                            <th onclick="ordenarTabla(1,'asignacionesTable')">Codigo</th>
+                            <th onclick="ordenarTabla(0,'asignacionesTable')">N° de Bien</th>
+                            <th onclick="ordenarTabla(1,'asignacionesTable')">Codigo del Bien</th>
                             <th onclick="ordenarTabla(2,'asignacionesTable')">Fecha de Asignacion</th>
                             <th onclick="ordenarTabla(3,'asignacionesTable')">Gerencia</th>
                             <th onclick="ordenarTabla(4,'asignacionesTable')">QR Code</th>
@@ -408,7 +408,7 @@
                             <th onclick="ordenarTabla(1,'DisponiblesTable')">Marca</th>
                             <th onclick="ordenarTabla(2,'DisponiblesTable')">Producto</th>
                             <th onclick="ordenarTabla(3,'DisponiblesTable')">Color</th>
-                            <th onclick="ordenarTabla(4,'DisponiblesTable')">Serial</th>
+                            <th onclick="ordenarTabla(4,'DisponiblesTable')">Modelo</th>
                             <th onclick="ordenarTabla(5,'DisponiblesTable')">Fecha de Registro</th>
                             <th onclick="ordenarTabla(6,'DisponiblesTable')">Categoria</th>
                             <th onclick="ordenarTabla(7,'DisponiblesTable')">Cantidad</th>
@@ -455,6 +455,16 @@
                 <input type="hidden" name="fecha_asignacion" id="inputFechaAsignacion"> 
                 <input type="hidden" name="gerencia_id" id="inputGerenciaID"> 
                 <input type="hidden" name="qr_code" id="inputQRCode"> 
+            </form>
+            <form id="formularioInformeDes" method="post" action="/mi_aplicacion/generar_informe_Des/" style="display:none;"> 
+                {% csrf_token %}
+                <input type="hidden" name="id" id="id_Desi"> 
+                <input type="hidden" name="codigo" id="codigo_des"> 
+                <input type="hidden" name="gerencia_id" id="gerencia_des"> 
+                <input type="hidden" name="fecha_Asignacion" id="fecha_Asignaciondes"> 
+                <input type="hidden" name="motivo" id="Motivo_desi">
+                <input type="hidden" name="fecha_retiro" id="fecha_Retirodes"> 
+                <input type="hidden" name="ubicacion" id="Ubicacion_finaldes"> 
             </form>
             <!-- Modal -->
             <div id="modal" class="modal">
@@ -516,6 +526,20 @@
             <button onclick="enviarDesincorporar()">Desincorporar</button>
             <button onclick="closeReporte()">Cerrar</button>
         </div>
+        <div id="DesFrame" class="formulario">
+            <h2>Informe</h2>
+            <p id="reporDes"></p>
+            <br><strong>ID: </strong> <span id="id_Des"></span>
+            <br><strong>Código: </strong> <span id="codigo_Data"></span>
+            <br><strong>Gerencia: </strong> <span id="gerencia_Data"></span>
+            <br><strong>Fecha de Asignación: </strong> <span id="fecha_AsignacionData"></span>
+            <br><strong>Motivo de Desincorporación: </strong> <span id="Motivo_des"></span>
+            <br><strong>Fecha de Retiro: </strong><span id="fecha_Retiro"></span>
+            <br><strong>Ubicación Final: </strong><span id="Ubicacion_final"></span>
+            <br><br><button onclick="generarInformeDes()">Imprimir PDF</button>
+            <button onclick="cerrarReporte()">Cerrar</button>
+        </div>
+
         <div id="loader" style="display: none;"></div>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     
@@ -977,7 +1001,7 @@
 
             document.getElementById('reporteDes').innerHTML = `
                 <img src="/static/cintillo2.png" style="width: 100%; height: auto; border: 5px;"><br><br>
-                <br><label style="text-aling: left; font-size: 20; ">DETALLES DEL BIEN NACIONAL</label><br>
+                <br><label style="text-aling: left; font-size: 20; ">DETALLES DE LA DESINCORPORACION</label><br>
                 
             `;
             document.getElementById('reporteFrame').style.display = 'block';
@@ -985,6 +1009,50 @@
 
         function closeReporte() {
             document.getElementById('reporteFrame').style.display = 'none';
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const DesTable= document.getElementById('DesincorporacionTable');
+            if (DesTable) {
+                DesTable.addEventListener('click', function(event) {
+                    const target = event.target;
+                    if (target.tagName === 'TD') {
+                        const row = target.parentNode;
+                        generarReporte(row);
+                    }
+                });
+            }
+        });
+
+        function generarReporte(row) {
+            const cells = row.getElementsByTagName('td');
+            selectedRowData3 = {
+                id: cells[0].textContent,
+                codigo: cells[1].textContent,
+                gerencia_id: cells[2].textContent,
+                fecha_asignacion: cells[3].textContent,
+                motivo: cells[4].textContent,
+                fecha_retiro: cells[5].textContent,
+                ubicacion: cells[6].textContent
+            };
+            document.getElementById('id_Des').textContent = selectedRowData3.id; 
+            document.getElementById('codigo_Data').textContent = selectedRowData3.codigo; 
+            document.getElementById('gerencia_Data').textContent = selectedRowData3.gerencia_id; 
+            document.getElementById('fecha_AsignacionData').textContent = selectedRowData3.fecha_asignacion;
+            document.getElementById('Motivo_des').textContent = selectedRowData3.motivo;
+            document.getElementById('fecha_Retiro').textContent = selectedRowData3.fecha_retiro;
+            document.getElementById('Ubicacion_final').textContent = selectedRowData3.ubicacion;
+
+            document.getElementById('reporDes').innerHTML = `
+                <img src="/static/cintillo2.png" style="width: 100%; height: auto; border: 5px;"><br><br>
+                <br><label style="text-aling: left; font-size: 20; ">DETALLES DEL BIEN NACIONAL</label><br>
+                
+            `;
+            document.getElementById('DesFrame').style.display = 'block';
+        }
+
+        function cerrarReporte() {
+            document.getElementById('DesFrame').style.display = 'none';
         }
 
             document.addEventListener("DOMContentLoaded", function() 
@@ -1016,7 +1084,18 @@
             document.getElementById('formularioInforme').submit(); 
             setTimeout(ocultarLoader, 15000);
         }
-
+        function generarInformeDes() { 
+            mostrarLoader();
+            document.getElementById('id_Desi').value = selectedRowData3.id; 
+            document.getElementById('codigo_des').value = selectedRowData3.codigo; 
+            document.getElementById('gerencia_des').value= selectedRowData3.gerencia_id; 
+            document.getElementById('fecha_Asignaciondes').value = selectedRowData3.fecha_asignacion;
+            document.getElementById('Motivo_desi').value = selectedRowData3.motivo;
+            document.getElementById('fecha_Retirodes').value = selectedRowData3.fecha_retiro;
+            document.getElementById('Ubicacion_finaldes').value= selectedRowData3.ubicacion;
+            document.getElementById('formularioInformeDes').submit();
+            setTimeout(ocultarLoader, 15000);
+        }
         function printReport() {
             const reportContent = document.getElementById('reportContent').innerHTML;
             const printWindow = window.open('', '', 'width=800,height=600');
