@@ -341,8 +341,8 @@
                 <input type="text" id="producto" placeholder="Producto">
                 <label for="color">Color</label> 
                 <input type="text" id="color" placeholder="Color"> 
-                <label for="serial">Serial</label> 
-                <input type="text" id="serial" placeholder="Serial">
+                <label for="serial">Modelo</label> 
+                <input type="text" id="serial" placeholder="Modelo">
                 <br><label for="fecha_registro">Fecha de Registro</label> 
                 <input type="date" id="fecha_registro" placeholder="Fecha de Registro">
                 <label for="cant">Cantidad</label>
@@ -431,7 +431,7 @@
                 <table id="DesincorporacionTable">
                     <thead>
                         <tr>
-                            <th onclick="ordenarTabla(0,'DesincorporacionTable')">Id</th>
+                            <th onclick="ordenarTabla(0,'DesincorporacionTable')">N° de desincorporacion</th>
                             <th onclick="ordenarTabla(1,'DesincorporacionTable')">Codigo del Bien</th>
                             <th onclick="ordenarTabla(2,'DesincorporacionTable')">Gerencia</th>
                             <th onclick="ordenarTabla(3,'DesincorporacionTable')">Fecha asignacion</th>
@@ -484,14 +484,14 @@
                 </div>
             </div>
         <div id="formulario6" class="formulario"> 
-                <h2>Reporte</h2>
+                <h2>Desincorporar bienes</h2>
                 <label for="palabra">Palabra de búsqueda</label>
                 <input type="text" id="searchInput3" onkeyup="filtrarTabla('reporteTable', 'searchInput3')"  placeholder="Buscar por palabra clave..." >
                 <div class="table-container">
                     <table id="reporteTable">
                         <thead>
                             <tr>
-                                <th onclick="ordenarTabla(0,'reporteTable')">Id</th>
+                                <th onclick="ordenarTabla(0,'reporteTable')">N° de Bien</th>
                                 <th onclick="ordenarTabla(1,'reporteTable')">Producto</th>
                                 <th onclick="ordenarTabla(2,'reporteTable')">Gerencia</th>
                                 <th onclick="ordenarTabla(3,'reporteTable')">Fecha de Asignacion</th>

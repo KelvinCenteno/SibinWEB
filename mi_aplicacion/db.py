@@ -295,8 +295,8 @@ def guardar_Bienes_Asignados(request):
         cursor = conexion.cursor()
         query = """
         SELECT a.id, a.codigo, a.fecha_Asignacion, g.nombre AS gerencia, a.qr_code 
-        FROM asignacion a 
-        JOIN gerencia g ON a.gerencia = g.id
+        FROM asignaciones a 
+        JOIN gerencia g ON a.gerencia_id = g.id
         """
         cursor.execute(query)
         asignaciones = cursor.fetchall()

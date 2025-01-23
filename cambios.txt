@@ -707,3 +707,123 @@ function cerrarFormulario() {
     </script>
 </body>
 </html>
+<div id="formulario2" class="formulario">
+    <h2>Asignación</h2>
+    <label>Selecciona una gerencia:</label>
+    <select id="gerencias" class="combo-box">
+        <option value="" disabled selected>Selecciona una opción...</option>
+    </select>
+    <label for="asignacion-fecha">Fecha de Asignación</label>
+    <input type="date" id="asignacion-fecha" placeholder="Fecha de Asignación">
+    <br><label for="asignacion-bien">Bien a Asignar</label>
+    <select id="Bienes" class="combo-box">
+        <option value="" disabled selected>Selecciona una opción...</option>
+    </select>
+    <div class="frame">
+        <img src="" id="imagenQR">
+    </div>
+    <br><button id="enviarAsignacion">Enviar</button> 
+    <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+    <br><br>
+</div>
+
+<div id="formulario2" class="formulario">
+    <h2>Asignación</h2>
+    <label>Selecciona una gerencia:</label>
+    <select id="gerencias" class="combo-box">
+        <option value="" disabled selected>Selecciona una opción...</option>
+    </select>
+    <label for="asignacion-fecha">Fecha de Asignación</label>
+    <input type="date" id="asignacion-fecha" placeholder="Fecha de Asignación">
+    <br><label for="asignacion-bien">Bien a Asignar</label>
+    <select id="Bienes" class="combo-box">
+        <option value="" disabled selected>Selecciona una opción...</option>
+    </select>
+    <div class="frame">
+        <img src="" id="imagenQR">
+    </div>
+    <br><button id="enviarAsignacion">Enviar</button> 
+    <button class="cerrar" onclick="cerrarFormulario()">Cerrar</button>
+    <br><br>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() { 
+    fetch('/mi_aplicacion/obtener_disponibles/') 
+    .then(response => response.json()) 
+    .then(data => { 
+        const comboBox = document.getElementById('Bienes'); 
+        comboBox.innerHTML = ''; 
+        data.forEach(bienes => { 
+            const newOption = document.createElement('option'); 
+            newOption.value = bienes.Id_Registro; 
+            newOption.textContent = bienes.Producto;
+            newOption.dataset.producto = bienes.Producto;  // Almacenar el nombre del producto como data-attribute
+            comboBox.appendChild(newOption); 
+        }); 
+    });
+
+    document.getElementById('enviarAsignacion').addEventListener('click', function(event) {
+        event.preventDefault();  // Evitar que el formulario se envíe automáticamente
+
+        const bienId = document.getElementById('Bienes').value;
+        const producto = document.getElementById('Bienes').options[document.getElementById('Bienes').selectedIndex].dataset.producto;
+        const fechaAsignacion = document.getElementById('asignacion-fecha').value;
+        const gerenciaSelect = document.getElementById('gerencias');
+        const gerenciaId = gerenciaSelect.value;
+        const gerenciaNombre = gerenciaSelect.options[gerenciaSelect.selectedIndex].text;
+
+        const formData = new FormData();
+        formData.append('codigo', bienId);
+        formData.append('producto', producto);  // Añadir el nombre del producto
+        formData.append('fecha_asignacion', fechaAsignacion);
+        formData.append('gerencia_id', gerenciaId);
+        formData.append('gerencia_nombre', gerenciaNombre);
+        formData.append('csrfmiddlewaretoken', getCookie('csrftoken')); // Añadir token CSRF
+
+        fetch('/mi_aplicacion/generar_qr_y_guardar/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json()) 
+        .then(data => { 
+            console.log(data.image);
+            if (data.image) { 
+                const img = document.getElementById('imagenQR'); 
+                img.src = `data:image/png;base64,${data.image}`; 
+                img.style.width = "100%";
+                img.style.height = "auto";
+            } else { 
+                alert('Error al generar el QR.');
+            } 
+        }) 
+        .catch(error => { 
+            console.error('Error al generar el QR:', error);
+        }); 
+    });
+
+    var span = document.getElementsByClassName("close")[0]; 
+    span.onclick = function() { 
+        const modal = document.getElementById("qrModal");
+        modal.style.display = "none";
+    }
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
