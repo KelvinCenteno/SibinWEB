@@ -72,6 +72,10 @@ def almacenar_asignacion(codigo, fecha_asignacion, gerencia_id, qr_code):
         VALUES (%s, %s, %s, %s)
         """
         cursor.execute(query, (codigo, fecha_asignacion, gerencia_id, qr_code))
+        query2 = """UPDATE registro
+        SET cantidad = cantidad - 1
+        WHERE id_registro = %s"""
+        cursor.execute(query2, (codigo))
         conexion.commit()
         cursor.close()
         conexion.close()
@@ -112,6 +116,7 @@ def Consulta_Bienes_Asignados():
         query = """
         SELECT a.id_asignacion, a.codigo, a.fecha_Asignacion, g.nombre AS gerencia, a.qr_code FROM asignaciones a 
         JOIN gerencia g ON a.gerencia = g.id
+        WHERE estatus = 'asignado'
         """
         cursor.execute(query)
         asignaciones = cursor.fetchall()
@@ -138,7 +143,8 @@ def consulta_disponibles():
         query = """SELECT r.Id_Registro, m.Nombre AS Marca, r.Producto, r.Color, r.Modelo, r.Fecha_Registro, 
         c.categoria AS Categoria, r.Foto, r.Cantidad FROM Registro r 
         JOIN Marca m ON r.Marca = m.Id
-        JOIN Categoria c ON r.Categoria = c.Id;"""  
+        JOIN Categoria c ON r.Categoria = c.Id
+        WHERE r.Cantidad > '0';"""  
         cursor.execute(query)
         disponibles = cursor.fetchall()
         cursor.close()
@@ -164,7 +170,8 @@ def obtener_disponibles():
         query = """SELECT r.Id_Registro, (r.Producto || ' ' || m.Nombre || ' ' || r.Color|| ' (' || r.Modelo|| ')') AS Producto, r.Fecha_Registro, 
         c.categoria AS Categoria, r.Foto, r.Cantidad FROM Registro r 
         JOIN Marca m ON r.Marca = m.Id
-        JOIN Categoria c ON r.Categoria = c.Id;"""  
+        JOIN Categoria c ON r.Categoria = c.Id
+        WHERE r.Cantidad > '0'"""  
         cursor.execute(query)
         bien_disponible = cursor.fetchall()
         cursor.close()
@@ -411,9 +418,13 @@ def registrar_desincorporacion(bien_retirar, motivo_retiro, fecha_retiro, ubicac
         cursor = conexion.cursor()
         query = """
         INSERT INTO desincorporacion (bien_retirar, motivo_retiro, fecha_retiro, "ubicación_final")
-        VALUES (%s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s);
         """
         cursor.execute(query, (bien_retirar, motivo_retiro, fecha_retiro, ubicacion_final))
+        query2 = """UPDATE asignaciones
+        SET estatus = 'desincorporado'
+        WHERE id_asignacion = %s;"""
+        cursor.execute(query2, (bien_retirar))
         conexion.commit()
         cursor.close()
         conexion.close()

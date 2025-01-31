@@ -70,10 +70,13 @@ def generar_qr_y_guardar(request):
         fecha_asignacion = request.POST.get('fecha_asignacion')
         gerencia_id = request.POST.get('gerencia_id')
         gerencia_name = request.POST.get('gerencia_nombre')
-        print(producto)
 
-        datos = f"Producto: {producto}\nCódigo de Bien: {codigo}\nFecha de Asignación: {fecha_asignacion}\nGerencia: {gerencia_name}"
-        
+        datos = (
+            f"PRODUCTO: {producto} | "
+            f"CÓDIGO DE BIEN: {codigo} | "
+            f"FECHA DE ASIGNACIÓN: {fecha_asignacion} | "
+            f"GERENCIA: {gerencia_name}"
+        )
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
