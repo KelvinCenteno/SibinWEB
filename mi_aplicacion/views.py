@@ -4,6 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .db import *
 import qrcode
+import segno 
 from io import BytesIO
 import base64
 from django.conf import settings 
@@ -66,41 +67,35 @@ def get_gerencias(request):
 def generar_qr_y_guardar(request):
     if request.method == 'POST':
         codigo = request.POST.get('codigo')
-        producto = request.POST.get('producto')  # Obtener el nombre del producto
+        producto = request.POST.get('producto')
         fecha_asignacion = request.POST.get('fecha_asignacion')
         gerencia_id = request.POST.get('gerencia_id')
         gerencia_name = request.POST.get('gerencia_nombre')
 
         datos = (
-            f"PRODUCTO: {producto} | "
-            f"CÓDIGO DE BIEN: {codigo} | "
-            f"FECHA DE ASIGNACIÓN: {fecha_asignacion} | "
-            f"GERENCIA: {gerencia_name}"
+            f"{producto} | "
+            f"{codigo} | "
+            f"{fecha_asignacion} | "
+            f"{gerencia_name}"
         )
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(datos)
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
+
+        # Crear el código QR con segno y ajustar el tamaño
+        qr = segno.make(datos, error='L', micro=False)
 
         buffered = BytesIO()
-        img.save(buffered, format="PNG")
+        qr.save(buffered, kind='png', scale=5, border=2) 
         img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
-        documentos_path = r'C:\Users\JORNADAS1\Documents' 
+        documentos_path = r'C:\Users\JORNADAS1\Documents'
         qr_dir = os.path.join(documentos_path, 'QR')
 
-        if not os.path.exists(qr_dir): 
-            os.makedirs(qr_dir) 
+        if not os.path.exists(qr_dir):
+            os.makedirs(qr_dir)
             
-        filename = f"qr_{codigo}_{fecha_asignacion}.png" 
-        file_path = os.path.join(qr_dir, filename) 
+        filename = f"qr_{codigo}_{fecha_asignacion}.png"
+        file_path = os.path.join(qr_dir, filename)
         
-        with open(file_path, "wb") as f: 
+        with open(file_path, "wb") as f:
             f.write(buffered.getvalue())
 
         exito = almacenar_asignacion(codigo, fecha_asignacion, gerencia_id, buffered.getvalue())
@@ -220,7 +215,7 @@ def generar_informe_view2(request):
                 with open(temp_qr_code_path, 'wb') as temp_file:
                     temp_file.write(qr_code_data)
 
-                ruta_plantilla = os.path.join(settings.BASE_DIR, 'templates_word', 'detalles_bienes.docx')
+                ruta_plantilla = os.path.join(settings.BASE_DIR, 'templates_word', 'detalles_bienes3.docx')
                 nombre_archivo = f'informe_{id}_{codigo}_{fecha_asignacion}_{gerencia_id}.pdf'
                 ruta_salida = os.path.join('C:/Users/JORNADAS1/Documents', nombre_archivo)
                 

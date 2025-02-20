@@ -43,7 +43,7 @@ def completar_plantilla(usuario, ruta_plantilla, ruta_salida, datos, ruta_qr, fo
                 parrafo.add_run().add_picture(ruta_qr, width=Inches(1.0))
             elif "{{QRCode2}}" in parrafo.text:
                 parrafo.text = parrafo.text.replace("{{QRCode2}}", "")
-                parrafo.add_run().add_picture(ruta_qr, width=Inches(0.6))
+                parrafo.add_run().add_picture(ruta_qr, width=Inches(1.0))
 
         if foto_base64:
             foto_data = base64.b64decode(foto_base64)
